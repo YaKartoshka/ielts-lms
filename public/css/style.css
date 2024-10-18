@@ -172,7 +172,7 @@ body {
     border-radius: 20px;
 }
 
-.person-head h4 {
+.person-head h5 {
     flex: 1;
 }
 
@@ -198,6 +198,27 @@ body {
 .knowledge-test .test-grade {
     position: absolute;
     bottom: 5px;
+}
+
+.courses-list {
+    display: flex;
+    align-items: center;
+}
+
+.course {
+    flex: 0.25;
+}
+
+.course-title {
+    display: flex;
+}
+
+.course-title h5 {
+    flex: 0.9;
+}
+
+.course img {
+    width: 300px;
 }
 
 /* Home end */
