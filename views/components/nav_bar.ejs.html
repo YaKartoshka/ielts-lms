@@ -1,0 +1,61 @@
+<div class="nav-bar p-2">
+  <ul>
+    <li class="">
+      <a href="/"><span class="material-symbols-outlined" style="font-size: 25px; font-weight: 500;">home</span>
+        <%=L('nav_bar1', language, 'Home' ) %>
+      </a>
+    </li>
+    <li class="">
+      <a href="/speaking"><span class="material-symbols-outlined" style="font-size: 25px; font-weight: 500;">person</span>
+        Speaking
+      </a>
+    </li>
+    <li class="">
+      <a href="/writing"><span class="material-symbols-outlined" style="font-size: 25px; font-weight: 500;">edit</span>
+        Writing
+      </a>
+    </li>
+    <li class="">
+      <a href="/reading"><span class="material-symbols-outlined" style="font-size: 25px; font-weight: 500;">home</span>
+        Reading
+      </a>
+    </li>
+
+    <select class="form-control me-3" id="language" onchange="changeLanguage()">
+      <option value="kz">Каз</option>
+      <option value="ru">Рус</option>
+      <option value="en">Eng</option>
+    </select>
+
+  </ul>
+</div>
+
+<script>
+
+  $(() => {
+    $('#language').val('<%= language %>');
+  });
+
+  function logout() {
+    $.ajax({
+      url: '/api/auth/logout',
+      method: 'POST',
+      success: function (r) {
+        window.location.replace("/login");
+      }
+    })
+  }
+
+  function changeLanguage() {
+    let language = $('#language').val();
+    $.ajax({
+      url: '/',
+      method: 'POST',
+      data: { action: 'changeLanguage', language: language },
+      dataType: 'json',
+      success: function (data) {
+        if (data.r) location.reload();
+      }
+    })
+  }
+</script>

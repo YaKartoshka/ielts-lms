@@ -1,0 +1,162 @@
+<div class="additional-content">
+
+    <div class="hot-links">
+        <ul class="hot-links-list">
+
+        </ul>
+        <% if (role=='admin' ) { %>
+            <button type="button" onclick="showAddLinkModal()"><span class="material-symbols-outlined"
+                    style="font-size: 25px; font-weight: 700;">add</span><%=L('links1', language, 'New Link') %></button>
+            <% } %>
+
+    </div>
+</div>
+
+<div class="modal fade" id="create_link-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><%=L('links2', language, 'Add Link') %></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3 mt-3">
+                        <label class="mb-2"><%=L('links3', language, 'Link text') %></label>
+                        <input type="text" class="form-control" id="link_text" placeholder="Text">
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label class="mb-2"><%=L('links4', language, 'Link URL') %></label>
+                        <input type="text" class="form-control" id="link_url" placeholder="https://">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="add_link_btn" class="btn btn-primary px-md-4"
+                    onclick="createLink()"><%=L('links5', language, 'Add') %></button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><%=L('links6', language, 'Close') %></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete_link-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><%=L('links7', language, 'Delete Link') %></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <%=L('links8', language, "You won't be able to revert this. Are you sure?") %>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="delete_link_btn" class="btn btn-danger px-md-4"
+                    onclick="deleteLink()"><%=L('links9', language, 'Delete') %></button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal"><%=L('links6', language, 'Close') %></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(()=>{
+        showLinks();
+    })
+    function showLinks() {
+        $(".hot-links-list").html('');
+        $.ajax({
+            url: '/links/get-all', method: 'get', success: function (data) {
+                var links_data = JSON.parse(data);
+                console.log(links_data)
+                if (!links_data.length) {
+                    var no_links = `<div class="no_links"><%=L('links10', language, 'No links yet') %></div>`
+                    $(".hot-links-list").append(no_links);
+                    return;
+                }
+                links_data.forEach((link) => {
+                    var list = `
+                    <li class="d-flex align-items-center justify-content-between">
+                        <a href="${link.link_url}" target="_blank">${link.link_text}</a>
+                        <% if (role=='admin' ) { %>
+                        <span class="material-symbols-outlined" onclick="showDeleteLinkModal('${link.link_id}')">delete</span>
+                        <% } %>
+                    </li>`;
+                    $(".hot-links-list").append(list);
+                });
+            }, error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+
+
+
+    function showAddLinkModal() {
+        $('#create_link-modal').modal('show');
+    }
+
+    function createLink() {
+        let link_url = $('#link_url').val().trim();
+        let link_text = $('#link_text').val().trim();
+
+        if (!(link_text && link_url)) {
+            $.ambiance({
+                message: "<%=L('links11', language, 'Please provide link text and link URL') %>.",
+                type: "error",
+                fade: true,
+                width: 400
+            });
+            return;
+        }
+
+        loading(2, el = '#add_link_btn');
+
+        $.ajax({
+            url: "/links/create", method: 'post', data: { link_text: link_text, link_url: link_url }, success: function (r) {
+                showLinks();
+                $('#link_url').val('');
+                $('#link_text').val('');
+                $('#create_link-modal').modal('hide');
+                loading(20, el = '#add_link_btn');
+                $.ambiance({
+                    message: "<%=L('links12', language, 'Link added') %>!",
+                    type: "success",
+                    fade: true
+                });
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        });
+    }
+
+    function showDeleteLinkModal(link_id) {
+        $('#delete_link-modal').modal('show');
+        globalLinkId = link_id;
+    }
+
+    function deleteLink() {
+        loading(2, el = '#delete_link_btn');
+        $.ajax({
+            url: '/links/delete',
+            method: 'POST',
+            data: { link_id: globalLinkId },
+            dataType: 'json',
+            success: function (res) {
+                if (res.r) {
+                    $.ambiance({
+                        message: "<%=L('links13', language, 'Link deleted') %>!",
+                        type: "success",
+                        fade: true
+                    });
+                }
+                $('#delete_link-modal').modal('hide');
+                loading(20, el = '#delete_link_btn');
+                showLinks();
+            }
+        });
+    }
+</script>

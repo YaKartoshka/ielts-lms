@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%=L('events1', language, 'Events') %></title>
+    <link rel="shortcut icon" href="../public/images/Favicon.png" type="image/x-icon">
+    <%- include('./components/head.ejs.html') %>
+    <style>
+       
+
+        @media (max-width: 500px) {
+            .content-head{
+                flex-wrap: wrap;
+                padding: 20px;
+            }
+            .divider{
+                margin: 5px 20px;
+            }
+            #new_event_members, #event_members{
+            max-height: 270px;
+        }
+        
+        }
+
+        #new_event_members, #event_members{
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+     
+        <div class="logo d-flex align-items-center">
+                <span class="material-symbols-outlined btn btn-light px-2 py-0 me-3 burger-menu" style="display: none;" onclick="toggleMenu()">
+                    menu
+                </span>
+             
+            <a href="/"><img src="/public/images/CoachMate.png" alt=""></a>
+        </div>
+        <%- include('./components/profile_bar.ejs.html') %>
+    </header>
+    <main>
+        <%- include('./components/nav_bar.ejs.html') %>
+            <div class="content">
+                <div class="content-head">
+                    <h1><%=L('events1', language, 'Events') %></h1>
+                    <% if (role=='admin' ) { %>
+                        <button onclick="showAddEventModal()" class="btn btn-primary d-flex"><span
+                                class="material-symbols-outlined"
+                                style="font-size: 25px; font-weight: 700;">add</span><%=L('events2', language, 'Add Event') %></button>
+                        <% } %>
+
+                </div>
+                <div class="divider"></div>
+                <div class="content-body">
+                    <div class="events"></div>
+                </div>
+            </div>
+            <%- include('./components/links_bar.ejs.html') %>
+
+    </main>
+    <footer></footer>
+
+    <!-- MODALS -->
+    <div class="modal fade" id="add_event-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><%=L('events2', language, 'Add Event') %></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form autocomplete="off">
+                        <div class="mb-3 mt-3">
+                            <label class="mb-2"><%=L('events3', language, 'Repetition') %></label>
+                            <select id="repetition" class="form-control">
+                                <option disabled="true" selected="" value=""><%=L('events4', language, 'Choose') %></option>
+                                <option value="single"><%=L('events5', language, 'Single') %></option>
+                                <option value="repeat"><%=L('events6', language, 'Repeat') %></option>
+                            </select>
+                        </div>
+                        <div class="mb-3 mt-3 hidden event_name-block">
+                            <label class="mb-2"><%=L('events7', language, 'Event name') %></label>
+                            <input type="text" id="event_name" class="form-control" placeholder="Karate" required />
+                        </div>
+                        <div class="mb-3 mt-3 hidden coach_name-block">
+                            <label class="mb-2"><%=L('events8', language, 'Coach name') %></label>
+                            <select name="coach_id" id="coach_id" class="form-control"></select>
+                        </div>
+                        <div class="mb-3 mt-3 hidden event_date-block">
+                            <label class="mb-2"><%=L('events9', language, 'Event date') %></label>
+                            <input type="date" class="form-control" id="event_date">
+                        </div>
+                        <div class="mb-3 mt-3 hidden week_day-block">
+                            <label class="mb-2"><%=L('events10', language, 'Week day') %></label>
+                            <select id="week_day" class="form-control">
+                                <option disabled="true" selected="" value=""><%=L('events11', language, 'Choose') %></option>
+                                <option value="monday"><%=L('events12', language, 'Monday') %></option>
+                                <option value="tuesday"><%=L('events13', language, 'Tuesday') %></option>
+                                <option value="wednesday"><%=L('events14', language, 'Wednesday') %></option>
+                                <option value="thursday"><%=L('events15', language, 'Thursday') %></option>
+                                <option value="friday"><%=L('events16', language, 'Friday') %></option>
+                                <option value="saturday"><%=L('events17', language, 'Saturday') %></option>
+                                <option value="sunday"><%=L('events18', language, 'Sunday') %></option>
+                            </select>
+
+                        </div>
+                        <div class="mb-3 mt-3 hidden time-block">
+                            <label class="mb-2"><%=L('events19', language, 'Time') %></label>
+                            <input type="time" id="time" class="form-control" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="add_event_btn" class="btn btn-primary px-md-4"
+                        onclick="addEvent()"><%=L('events20', language, 'Add') %></button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><%=L('events21', language, 'Close') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="edit_event-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><%=L('events22', language, 'Edit Event') %></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form autocomplete="off">
+                        <div class="mb-3 mt-3">
+                            <label class="mb-2"><%=L('events3', language, 'Repetition') %></label>
+                            <select id="new_repetition" class="form-control" disabled>
+                                <option disabled="true" selected="" value=""><%=L('events4', language, 'Choose') %></option>
+                                <option value="single"><%=L('events5', language, 'Single') %></option>
+                                <option value="repeat"><%=L('events6', language, 'Repeat') %></option>
+                            </select>
+                        </div>
+                        <div class="mb-3 mt-3 hidden event_name-block">
+                            <label class="mb-2"><%=L('events7', language, 'Event name') %></label>
+                            <input type="text" id="new_event_name" class="form-control" placeholder="Karate" required />
+                        </div>
+                        <div class="mb-3 mt-3 hidden coach_name-block">
+                            <label class="mb-2"><%=L('events8', language, 'Coach name') %></label>
+                            <select name="coach_id" id="new_coach_id" class="form-control"></select>
+                        </div>
+                        <div class="mb-3 mt-3 hidden event_date-block">
+                            <label class="mb-2"><%=L('events9', language, 'Event date') %></label>
+                            <input type="date" class="form-control" id="new_event_date">
+                        </div>
+                        <div class="mb-3 mt-3 hidden week_day-block">
+                            <label class="mb-2"><%=L('events10', language, 'Week day') %></label>
+                            <select id="new_week_day" class="form-control">
+                                <option disabled="true" selected="" value=""><%=L('events11', language, 'Choose') %></option>
+                                <option value="monday"><%=L('events12', language, 'Monday') %></option>
+                                <option value="tuesday"><%=L('events13', language, 'Tuesday') %></option>
+                                <option value="wednesday"><%=L('events14', language, 'Wednesday') %></option>
+                                <option value="thursday"><%=L('events15', language, 'Thursday') %></option>
+                                <option value="friday"><%=L('events16', language, 'Friday') %></option>
+                                <option value="saturday"><%=L('events17', language, 'Saturday') %></option>
+                                <option value="sunday"><%=L('events18', language, 'Sunday') %></option>
+                            </select>
+
+                        </div>
+                        <div class="mb-3 mt-3 hidden time-block">
+                            <label class="mb-2"><%=L('events19', language, 'Time') %></label>
+                            <input type="time" id="new_time" class="form-control" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="edit_event_btn" class="btn btn-primary px-md-4"
+                        onclick="editEvent()"><%=L('events23', language, 'Edit') %></button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><%=L('events21', language, 'Close') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete_event-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><%=L('events24', language, 'Delete Event') %></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <%=L('events25', language, "You won't be able to revert this. Are you sure?") %>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="delete_event_btn" class="btn btn-danger px-md-4"
+                        onclick="deleteEvent()"><%=L('events26', language, 'Delete') %></button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><%=L('events21', language, 'Close') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="show_members-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><%=L('events27', language, 'Members') %></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="new_event_members_block" style="display: none;">
+                        <div id="new_event_members" class="d-flex flex-column gap-3">
+
+                        </div>
+                    </div>
+                    <div id="event_members_block">
+                        <div id="event_members" class="d-flex flex-column gap-3">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary " onclick="saveMembers()" id="save_members_btn"
+                        style="display: none; "><%=L('events28', language, 'Save') %></button>
+                    <button type="button" class="btn btn-success " onclick="showMembers()" id="show_members_btn"
+                        style="display: none;"><%=L('events29', language, 'Show Members') %></button>
+                        <% if (role=='admin' ) { %>
+                    <button type="button" class="btn btn-success" onclick="showNewMembers()" id="add_member_btn">+ <%=L('events30', language, 'Add Member') %></button>
+                    <% } %>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><%=L('events21', language, 'Close') %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript" src="https://s2.webapi.ai/chat-widget/uniq-chat.js"></script>
+
+    <script>
+        var ailabs_user_info = {
+            'client': 'c1463',
+            'welcome_message': 'Welcome to the chat 👋',
+            'popup_mode': 0, //0-off, 1-auto popup after 10 seconds for new users
+            'input_comment': 'Type your message or /start to restart'
+        };
+        AILabsChatStart();
+    </script>
+
+
+    <!-- END OF MODALS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var globalEventIndex;
+        var globalEventId;
+        var globalEvents;
+        var globalLinkId;
+        var globalUsers;
+
+        $(document).ready(function () {
+            loading(1);
+            showEvents();
+            getUsers();
+            loading(0);
+        });
+
+        $(document).ready(function () {
+            var currentUrl = window.location.pathname;
+
+            $(".nav-bar ul li").each(function () {
+                var listItem = $(this);
+                var listItemLink = listItem.find("a");
+                var listItemHref = listItemLink.attr("href");
+
+                if (currentUrl === listItemHref) {
+                    listItem.addClass("active");
+                } else {
+                    listItem.removeClass("active");
+                }
+            });
+        });
+
+        function showEvents() {
+            $.ajax({
+                url: '/events/get',
+                method: 'GET',
+                success: function (data) {
+                    globalEvents = data
+                    var i = 0;
+                    eventsHTML = '';
+                    data.forEach((ed) => {
+                        var formattedDate = new Date(ed.event_date).toLocaleString('default', { month: 'long', day: 'numeric' })
+                        eventsHTML += `
+                            <div class="event" id="event-${i}"> 
+                                <div class="date_time"><b>${ed.event_date ? formattedDate : (ed.week_day.charAt(0).toUpperCase() + ed.week_day.slice(1))} ${ed.time}</b></div>
+                                <div class="event_name text-center">${ed.event_name}</div>
+                                <div class="coach_name">Coach: ${ed.coach_name}</div>
+                                <button class="btn btn-primary mx-5 px-5 members_btn" onclick="showMembersModal('event-${i}')">Members</button>
+                                <% if (role=='admin' ) { %>
+                                    <button type="button" class="btn btn-light dropdown-toggle d-flex" data-bs-toggle="dropdown" style="float:right;">
+                                        <div class="more_icon d-flex">
+                                        <span class="material-symbols-outlined" style="font-size: 25px; font-weight: 900;">
+                                        more_horiz
+                                        </span>
+                                        </div>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="javascript:void(0)" onclick="showEditEventModal('event-${i}')"><%=L('events23', language, 'Edit') %></a>
+                                        <a class="dropdown-item" href="javascript:void(0)" onclick="showDeleteEventModal('event-${i}')"><%=L('events26', language, 'Delete') %></a>
+                                    </div>
+                                 <% } %>
+                               
+                            </div>
+                            `
+                        i++;
+                    });
+                    $('.events').html(eventsHTML);
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            });
+        }
+
+        function showAddEventModal() {
+            showCoaches();
+            $('#add_event-modal').modal('show');
+        }
+
+        function addEvent() {
+            loading(2, el = "#add_event_btn");
+            let repetition = $("#repetition").val();
+            let event_name = $("#event_name").val();
+            let event_type = $("#event_type").val();
+            let time = $("#time").val();
+            let event_date = $("#event_date").val();
+            let week_day = $("#week_day").val();
+            let coach_id = $('#coach_id').val();
+            let coach_name = $('#coach_id option:selected').text();
+
+            (repetition == 'single') ? week_day = null : event_date = null;
+
+            if (event_name.length > 25) {
+                $.ambiance({
+                    message: "<%=L('events31', language, 'Event name must be 25 characters or less') %>.",
+                    type: 'error',
+                    fade: true,
+                    width: 400
+                });
+                return loading(20, el = "#add_event_btn");
+            }
+
+            if (coach_id && repetition && event_name && time && (event_date || week_day)) {
+                $.ajax({
+                    type: "POST",
+                    url: "/events/create",
+                    data: {
+                        repetition: repetition,
+                        event_name: event_name,
+                        time: time,
+                        event_date: event_date,
+                        week_day: week_day,
+                        coach_id: coach_id,
+                        coach_name: coach_name
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.r) {
+                            $('#add_event-modal').modal('hide');
+                            $("#repetition").val('');
+                            $("#event_name").val('');
+                            $("#event_type").val('');
+                            $("#time").val('');
+                            $("#event_date").val('');
+                            $("#week_day").val('');
+                            $("#coach_id").val('');
+                            $.ambiance({
+                                message: "<%=L('events32', language, 'Event added successfully') %>!",
+                                type: "success",
+                                fade: true,
+                                width: 400
+                            });
+                            loading(20, el = "#add_event_btn");
+                            return showEvents();
+                        }
+                      
+                    },
+                    error: function (error) {
+                        console.error("Error:", error);
+                        $.ambiance({
+                            message: "<%=L('events33', language, 'Error adding event. Please try again') %>.",
+                            type: 'error',
+                            fade: true,
+                            width: 400
+                        });
+                        return;
+                    }
+                });
+            } else {
+                $.ambiance({
+                    message: "<%=L('events34', language, 'Please fill in all fields') %>!",
+                    type: 'error',
+                    fade: true,
+                    width: 400
+                });
+                return;
+            }
+        }
+
+        function showMembersModal(event_index) {
+            $("#show_members-modal").modal('show');
+            globalEventIndex = event_index;
+            globalEventId = globalEvents[event_index.split('-')[1]].event_id;
+            showMembers();
+        }
+
+        function showMembers() {
+            var members = JSON.parse(globalEvents[globalEventIndex.split('-')[1]].members);
+            console.log(members)
+            $('#event_members_block').show();
+            $("#add_member_btn").show();
+            $('#new_event_members_block').hide();
+            $("#show_members_btn").hide();
+            var membersHTML = '';
+            var i = 0;
+            members.forEach((m) => {
+                membersHTML += `
+                <div class="member flex-fill" id="member-${i}">
+                    <h3>${m.first_name} ${m.last_name}</h3>
+                     <% if (role=='admin' ) { %>
+                    <button class="btn btn-danger material-symbols-outlined" style="scale: 0.75;" onclick="deleteMember('${m.id}', ${i})">
+                        delete
+                    </button>
+                     <% } %>
+                </div>
+                `
+                i++;
+            });
+            if (!members.length) membersHTML = "<div class='alert alert-light'><%=L('events35', language, 'No members') %>.</div>"
+            $('#event_members').html(membersHTML);
+            // console.log(globalUsers);
+            // console.log(globalEvents);
+        }
+
+        function showNewMembers() {
+            $("#event_members_block").hide();
+            $("#new_event_members_block").show();
+            $("#add_member_btn").hide();
+            $("#show_members_btn").show();
+
+            var eventMembers = JSON.parse(globalEvents[globalEventIndex.split('-')[1]].members);
+            var allStudents = globalUsers.filter((user) => {
+                return user.role == 'student'
+            });
+
+            var newMembers = allStudents.filter(user => !eventMembers.some(m => m.id == user.id));
+            var newMembersHTML = '';
+            var i = 0;
+            newMembers.forEach((nu) => {
+                newMembersHTML += `
+                <div class="member flex-fill" id="new_member-${i}">
+                    <h3>${nu.first_name} ${nu.last_name}</h3>
+                    <button class="btn btn-success material-symbols-outlined" style="scale: 0.75;" onclick="addMemberToEvent('${nu.id}', ${i})">
+                        add
+                    </button>
+                </div>
+                `
+                i++;
+            });
+            if (!newMembers.length) newMembersHTML = "<div class='alert alert-light'><%=L('events36', language, 'No members to add') %>.</div>"
+            $('#new_event_members').html(newMembersHTML);
+        }
+
+        function showEditEventModal(event_index) {
+            showCoaches();
+            var event = globalEvents[event_index.split('-')[1]];
+
+            $("#new_repetition").val(event.repetition).change();
+            $("#new_event_name").val(event.event_name);
+            $("#new_coach_id").val(event.coach_id);
+            $("#new_week_day").val(event.week_day);
+            $("#new_time").val(event.time);
+            $("#new_event_date").val(event.event_date);
+            $('#edit_event-modal').modal('show');
+        }
+
+
+
+        function editEvent() {
+            loading(2, el = "#edit_event_btn");
+            let event_name = $("#new_event_name").val();
+            let time = $("#time").val();
+            let event_date = $("#new_event_date").val();
+            let week_day = $("#new_week_day").val();
+            let coach_id = $('#new_coach_id').val();
+            let coach_name = $('#new_coach_id option:selected').text();
+
+            (repetition == 'single') ? week_day = null : event_date = null;
+
+            if (event_name.length > 25) {
+                $.ambiance({
+                    message: "<%=L('events31', language, 'Event name must be 25 characters or less') %>.",
+                    type: 'error',
+                    fade: true,
+                    width: 400
+                });
+                return loading(20, el = "#edit_event_btn");
+            }
+
+            if (coach_id && repetition && event_name && time && (event_date || week_day)) {
+                $.ajax({
+                    type: "POST",
+                    url: "/events/create",
+                    data: {
+                        repetition: repetition,
+                        event_name: event_name,
+                        time: time,
+                        event_date: event_date,
+                        week_day: week_day,
+                        coach_id: coach_id,
+                        coach_name: coach_name
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.r) {
+                            $('#add_event-modal').modal('hide');
+                            $("#repetition").val('');
+                            $("#event_name").val('');
+                            $("#event_type").val('');
+                            $("#time").val('');
+                            $("#event_date").val('');
+                            $("#week_day").val('');
+                            $("#coach_id").val('');
+                            $.ambiance({
+                                message: "<%=L('events40', language, 'Event updated successfully') %>!",
+                                type: "success",
+                                fade: true,
+                                width: 400
+                            });
+                            return;
+                        }
+                        loading(20, el = "#edit_event_btn");
+                    },
+                    error: function (error) {
+                        console.error("Error:", error);
+                        $.ambiance({
+                            message: "<%=L('events41', language, 'Error editing event. Please try again') %>",
+                            type: 'error',
+                            fade: true,
+                            width: 400
+                        });
+                        return;
+                    }
+                });
+            } else {
+                $.ambiance({
+                    message: "<%=L('events34', language, 'Please fill in all fields') %>!",
+                    type: 'error',
+                    fade: true,
+                    width: 400
+                });
+                return;
+            }
+        }
+
+        function showDeleteEventModal(event_index) {
+            globalEventId = globalEvents[event_index.split('-')[1]].event_id;
+            $('#delete_event-modal').modal('show');
+        }
+
+        function deleteEvent() {
+            loading(2, el = "#delete_event_btn");
+            $.ajax({
+                type: "POST",
+                url: "/events/delete",
+                data: {
+                    event_id: globalEventId
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (res.r) {
+                        $.ambiance({
+                            message: "<%=L('events38', language, 'Event deleted successfully') %>!",
+                            type: "success",
+                            fade: true,
+                            width: 400
+                        });
+                    }
+                    loading(20, el = "#delete_event_btn");
+                    return $('#delete_event-modal').modal('hide');
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                    $.ambiance({
+                        message: "<%=L('events39', language, 'Error deleting event. Please try again') %>",
+                        type: 'error',
+                        fade: true,
+                        width: 400
+                    });
+                    return loading(20, el = "#delete_event_btn");
+                }
+            });
+
+        }
+
+        async function showCoaches() {
+            var coaches_data = globalUsers.filter((user) => {
+                return user.role == 'coach'
+            });
+
+            if (!coaches_data.length) {
+                let no_members = `
+                        <div class="no_members"><%=L('events35', language, 'No members') %></div>
+                        `
+                $('.members').append(no_members);
+
+            }
+            var coachHTML = '<option value="none" disabled selected="true">None</option>'
+            coaches_data.forEach((coach) => {
+                coachHTML += `<option value="${coach.id}">${coach.first_name} ${coach.last_name}</option>`;
+            });
+            $('#coach_id').html(coachHTML);
+            $('#new_coach_id').html(coachHTML);
+        }
+
+        function getUsers() {
+            $.ajax({
+                url: '/users/get-all',
+                method: 'get',
+                data: { roles: 'all' },
+                dataType: 'json',
+                success: function (users_data) {
+                    globalUsers = users_data;
+                }, error: function (err) {
+                    globalUsers = [];
+                    console.log(err);
+                }
+            });
+        }
+
+        function addMemberToEvent(new_member_id, index) {
+            $("#save_members_btn").show();
+            $(`#new_member-${index}`).remove();
+            let new_member = globalUsers.filter((user) => {
+                return user.id == new_member_id;
+            });
+            var members = JSON.parse(globalEvents[globalEventIndex.split('-')[1]].members);
+            members.push(new_member[0]);
+            globalEvents[globalEventIndex.split('-')[1]].members = JSON.stringify(members);
+            showNewMembers();
+        }
+
+        function deleteMember(member_id, index) {
+            $("#save_members_btn").show();
+            $(`#member-${index}`).remove();
+            let members = JSON.parse(globalEvents[globalEventIndex.split('-')[1]].members)
+            let updated_members = members.filter((user) => {
+                return user.id != member_id;
+            });
+
+            globalEvents[globalEventIndex.split('-')[1]].members = JSON.stringify(updated_members);
+            showMembers();
+        }
+
+        function saveMembers() {
+            loading(2, el = "#save_members_btn");
+            $.ajax({
+                url: '/events/members/update',
+                method: 'POST',
+                data: { event_id: globalEventId, members: globalEvents[globalEventIndex.split('-')[1]].members },
+                dataType: 'json',
+                success: function (res) {
+                    if (res.r) {
+                        $.ambiance({
+                            message: "<%=L('events', language, 'Members updated') %>!",
+                            type: "success",
+                            fade: true
+                        });
+                    }
+                    $('#save_members_btn').hide();
+                    return loading(20, el = "#save_members_btn");
+                }
+            })
+        }
+
+        $("#repetition").on('change', (() => {
+            let repetition = $('#repetition').val();
+
+            if (repetition == 'single') {
+                $('.event_date-block').show();
+                $('.week_day-block').hide();
+            } else {
+                $('.week_day-block').show();
+                $('.event_date-block').hide();
+            }
+            $('.time-block').show();
+            $('.event_type-block').show();
+            $('.event_name-block').show();
+            $('.coach_name-block').show();
+        }));
+
+        $("#new_repetition").on('change', (() => {
+            let repetition = $('#new_repetition').val();
+
+            if (repetition == 'single') {
+                $('.event_date-block').show();
+                $('.week_day-block').hide();
+            } else {
+                $('.week_day-block').show();
+                $('.event_date-block').hide();
+            }
+            $('.time-block').show();
+            $('.event_type-block').show();
+            $('.event_name-block').show();
+            $('.coach_name-block').show();
+        }));
+
+
+    </script>
+</body>
+
+</html>

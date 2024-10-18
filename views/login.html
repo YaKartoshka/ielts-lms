@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoachMate</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <link rel="shortcut icon" href="../public/images/Favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="../public/css/common.css">
+    <link rel="stylesheet" href="../public/css/style.css">
+    <link href="../public/fonts/fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://www.richardhsu.me/jquery.ambiance/assets/css/jquery.ambiance.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.richardhsu.me/jquery.ambiance/assets/js/jquery.ambiance.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+    <script>
+
+        function loading(mode, el = null) {
+            if (mode == 1) {
+                $(el).html('<img src="/public/images/preloader.svg" class="loader_overlay">');
+            } else if (mode == 2) {
+                $(el).prepend('<div class="spinner-border"></div> ').attr('disabled', true);
+            } else if (mode == 20) {
+                setTimeout(function () {
+                    $(el).removeAttr('disabled');
+                    $(el).find('.spinner-border').remove();
+                }, 500);
+            } else if (mode == 3) {
+                $(el).append(' <div class="spinner-border"></div>');
+            } else if (mode == 30) {
+                $(el).find('.spinner-border').remove();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="login_panel">
+        <div class="auth">
+
+            <div class="title">
+                <p>CoachMate</p>
+            </div>
+
+            <div class="switcher">
+                <button id="signInButton" class="active" onclick="showForm('signIn')">Sign In</button>
+                <button id="signUpButton" onclick="showForm('signUp')">Sign Up</button>
+            </div>
+
+            <div class="sign_in_form mt-3">
+                <div class="sign_in_heading">
+                    <p>Sign In</p>
+                </div>
+                <div id="ambiance">
+                </div>
+                <div class="form">
+                    <div class="email">
+                        <input type="text" autocomplete="on" name="email" id="email" placeholder="Email">
+                    </div>
+                    <div class="password">
+                        <input type="password" autocomplete="on" name="password" id="password" placeholder="Password">
+                        <div class="forgot">
+                            <a href="#">Forgot a password ?</a>
+                        </div>
+                    </div>
+                    <div class="login_btn_block">
+                        <button type="button" id="login_btn" onclick="signIn()">Login</button>
+                    </div>
+                    <div class="continue">
+                        <div class="continue_text">
+                            <div class="text text_or">
+                                <p>or</p>
+                            </div>
+                        </div>
+                        <a href="/auth/google_sign_in" class="sign_up_link">
+                            <div class="sign_in_btn google">
+                                <div class="google_icon">
+                                    <img src="../public/images/google_icon.png" alt="" width="24">
+                                </div>
+                                <div class="google_text">
+                                    <p>Continue with Google</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sign_up_form">
+                <div class="sign_up_heading">
+                    <p>Sign Up</p>
+                </div>
+                <div id="ambiance">
+                </div>
+                <div class="form">
+                    <div class="email">
+                        <input type="text" autocomplete="off" name="email" id="email" placeholder="Email">
+                    </div>
+                    <div class="password">
+                        <input type="password" autocomplete="off" name="password" id="password" placeholder="Password">
+                    </div>
+                    <div class="rep_password">
+                        <input type="password" name="rep_password" id="rep_password"
+                            placeholder="Repeat password">
+                    </div>
+                    <div class="sign_up_btn_block">
+                        <button type="button" id="sign_up_btn" onclick="signUp()">Sign Up</button>
+                    </div>
+                    <div class="continue">
+                        <div class="continue_text">
+                            <div class="text">
+                                <p>or</p>
+                            </div>
+                        </div>
+                        <a href="/auth/google_sign_up" class="sign_up_link">
+                            <div class="sign_up_btn google">
+                                <div class="google_icon">
+                                    <img src="../public/images/google_icon.png" alt="" width="24">
+                                </div>
+                                <div class="google_text">
+                                    <p>Continue with Google</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="welcome_screen">
+            <div class="title">
+                <p>CoachMate</p>
+            </div>
+            <div class="welcome_img">
+                <img src="../public/images/welcome.png" alt="" width="350px">
+            </div>
+            <div class="welcome_text">
+                <p>Welcome back, please login to your account</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        $(document).ready(function () {
+            loading(1);
+            showForm('signIn');
+            handleGoogleSignInFailure()
+            handleGoogleSignUpFailure();
+            loading(0);
+        });
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function signIn() {
+            loading(2, el = '#login_btn');
+            let email = $('.sign_in_form #email').val().trim().toLowerCase();
+            let password = $('.sign_in_form #password').val().trim();
+            let ambianceElement = $('.sign_in_form #ambiance');
+
+            if (!email || !password) {
+                loading(20, el = '#login_btn');
+                ambianceElement.html('<p>Enter login data</p>').addClass('show warning');
+                setTimeout(function () {
+                    ambianceElement.removeClass('show warning').html('');
+                }, 3000);
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                ambianceElement.html('<p>Invalid Email</p>').addClass('invalid-email show');
+                setTimeout(function () {
+                    loading(20, el = '#login_btn');
+                    ambianceElement.removeClass('show invalid-email').html('');
+                }, 2000);
+                return;
+            }
+
+            $.ajax({
+                method: 'post',
+                url: '/auth/sign-in',
+                data: {
+                    email: email,
+                    password: password
+                }, success: function (res) {
+                    let data = JSON.parse(res);
+                    if (data.r == 1) {
+                        ambianceElement.html('<p>Success!</p>').addClass('success');
+                        setTimeout(function () {
+                            ambianceElement.removeClass('show success error info too-many-requests').html('');
+                            window.location.href = '/';
+                        }, 1000);
+                    } else if (data.r == 0) {
+                        ambianceElement.html('<p>Wrong Password</p>').addClass('error');
+                    } else if (data.r == 2) {
+                        ambianceElement.html('<p>User not found</p>').addClass('info');
+                    } else if (data.r == 3) {
+                        ambianceElement.html('<p>The panel is not available</p>').addClass('too-many-requests');
+                    }
+                    loading(20, el = '#login_btn');
+                    ambianceElement.addClass('show');
+                    setTimeout(function () {
+                        ambianceElement.removeClass('show success error info too-many-requests').html('');
+                    }, 3000);
+                }, error: function (err) {
+                    loading(20, el = '#login_btn');
+                    console.log(err);
+                }
+            });
+        }
+
+        function signUp() {
+            loading(2, el = '#sign_up_btn');
+            let email = $('.sign_up_form #email').val().trim().toLowerCase();
+            let password = $('.sign_up_form #password').val().trim();
+            let rep_password = $('.sign_up_form #rep_password').val().trim();
+            let ambianceElement = $('.sign_up_form #ambiance');
+
+            if (!email || !password || !rep_password) {
+                loading(20, el = '#sign_up_btn');
+                ambianceElement.html('<p>Enter required data</p>').addClass('show warning');
+                setTimeout(function () {
+                    ambianceElement.removeClass('show warning').html('');
+                }, 3000);
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                ambianceElement.html('<p>Invalid Email</p>').addClass('invalid-email show');
+                setTimeout(function () {
+                    loading(20, el = '#sign_up_btn');
+                    ambianceElement.removeClass('show invalid-email').html('');
+                }, 2000);
+                return;
+            }
+
+            $.ajax({
+                method: 'post',
+                url: '/auth/sign-up',
+                data: {
+                    email: email,
+                    password: password
+                }, success: function (res) {
+                    let data = JSON.parse(res);
+                    if (data.r == 1) {
+                        ambianceElement.html('<p>Success!</p>').addClass('success');
+                        setTimeout(function () {
+                            ambianceElement.removeClass('show success error info too-many-requests').html('');
+                            window.location.href = '/';
+                        }, 1000);
+                    } else if (data.r == 4) {
+                        ambianceElement.html('Email address already in use').addClass('warning');
+                    } else {
+                        ambianceElement.html('Error. Try again later!').addClass('error');
+                    }
+                    loading(20, el = '#sign_up_btn');
+                    ambianceElement.addClass('show');
+                    setTimeout(function () {
+                        ambianceElement.removeClass('show success error info too-many-requests').html('');
+                    }, 3000);
+                }, error: function (err) {
+                    loading(20, el = '#sign_up_btn');
+                    console.log(err);
+                }
+            });
+        }
+
+        function handleGoogleSignInFailure() {
+            let currentUrl = window.location.href;
+
+            if (currentUrl.includes('status=0')) {
+                const ambianceElement = $('.sign_in_form #ambiance');
+                ambianceElement.html('<p>User not found</p>').addClass('show info');
+                setTimeout(function () {
+                    ambianceElement.removeClass('show info').html('');
+                }, 3000);
+
+                currentUrl = currentUrl.replace('?status=0', '');
+                window.history.replaceState(null, '', currentUrl);
+            }
+        }
+
+
+        function handleGoogleSignUpFailure() {
+            let currentUrl = window.location.href;
+
+            if (currentUrl.includes('status=1')) {
+                const ambianceElement = $('.sign_in_form #ambiance');
+                ambianceElement.html('<p>Email address already in use</p>').addClass('show warning');
+                setTimeout(function () {
+                    ambianceElement.removeClass('show warning').html('');
+                }, 3000);
+                currentUrl = currentUrl.replace('?status=1', '');
+                window.history.replaceState(null, '', currentUrl);
+            }
+        }
+
+        function showForm(formType) {
+            const signUpButton = document.getElementById('signUpButton');
+            const signInButton = document.getElementById('signInButton');
+            const signUpForm = document.querySelector('.sign_up_form');
+            const signInForm = document.querySelector('.sign_in_form');
+            signUpButton.classList.toggle('active', formType == 'signUp');
+            signInButton.classList.toggle('active', formType != 'signUp');
+            signUpForm.style.display = formType == 'signUp' ? 'flex' : 'none';
+            signInForm.style.display = formType != 'signUp' ? 'flex' : 'none';
+        }
+    </script>
+
+</body>
+
+</html>

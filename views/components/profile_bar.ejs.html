@@ -1,0 +1,54 @@
+<div class="profile" id="dropdown_profile">
+    <div id="profile-data">
+        <div class="profile-name"></div>
+        <img src="" class="profile-img">
+        <div class="profile-dropdown">
+            <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6" fill="none"
+                class="mr-1.5 h-2 w-2 ">
+                <path
+                    d="M4.49738 5.37596C4.29947 5.67283 3.86325 5.67283 3.66533 5.37596L0.599593 0.777349C0.378075 0.445072 0.616271 -1.73895e-07 1.01562 -1.39084e-07L7.1471 3.95398e-07C7.54645 4.30209e-07 7.78465 0.445073 7.56313 0.77735L4.49738 5.37596Z"
+                    fill="currentColor"></path>
+            </svg>
+        </div>
+    </div>
+    <div class="dropdown-content">
+        <ul>
+            <li>
+                <a href="/profile"><%=L('prof_bar1', language, 'Profile') %></a>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <a href="/members"><%=L('prof_bar2', language, 'Members') %></a>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <a href="/auth/logout"><%=L('prof_bar3', language, 'Log out') %></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    var globalUser;
+    
+    $('#profile-data').on('click', () => {
+            $('.dropdown-content').slideToggle(300);
+    });
+
+    function showProfileBar() {
+            if(sessionStorage.getItem('profile_src'))  $('#dropdown_profile .profile-img').attr('src', sessionStorage.getItem('profile_src'));
+            $.ajax({
+                url: '/users/get', method: 'get', success: function (data) {
+                    var user = JSON.parse(data);
+                    globalUser = user
+                    $("#dropdown_profile .profile-name").val(user.first_name);
+                    let profile_src = !user.profile_img ? "/public/images/user_avatar.png" : user.profile_img;
+                    $('#dropdown_profile .profile-img').attr('src', profile_src)
+                    sessionStorage.setItem('profile_src', profile_src)
+                }, error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+        showProfileBar()
+</script>
