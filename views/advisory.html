@@ -31,6 +31,10 @@
                 max-height: 270px;
                 overflow-y: auto;
             }
+
+            .advisor-card {
+                flex: 0.25;
+            }
         </style>
 </head>
 
@@ -73,6 +77,12 @@
                     </div>
                     <div class="searching-btn mt-3">
                         <button class="btn btn-primary">Поиск</button>
+                    </div>
+                </div>
+
+                <div class="element-box">
+                    <div class="advisors-list d-flex" id="advisors_list">
+
                     </div>
                 </div>
             </div>
@@ -211,11 +221,82 @@
     <script>
         var globalNews;
         var globalNewsId;
+        const advisors = [
+            { id: 1, full_name: "Мэйсон Ли", country: "Южная Корея", language: 'Корейский', university: "Сеульский национальный университет" },
+            { id: 2, full_name: "Элис Джонсон", language: 'Английский', country: "США" },
+            { id: 3, full_name: "София Мартинес", language: 'Испанский', country: "Испания" },
+            { id: 4, full_name: "Эмма Браун", country: "Германия", language: 'Немецкий', university: "Технический университет Мюнхена" },
+        ]
 
         $(document).ready(function () {
             loading(1);
+            $('#search_country').on('input', function () {
+                filterAdvisors();
+            });
+
+            $('#search_uni').on('input', function () {
+                filterAdvisors();
+            });
+
+            $('.searching-btn button').on('click', function () {
+                filterAdvisors();
+            });
+
+            showAdvisors(advisors);
             loading(0);
         });
+
+        function showAdvisors(advisorsList) {
+            $('#advisors_list').empty();
+            advisorsList.forEach(advisor => {
+                var advisorCard = `
+                <div class="advisor-card">
+                    <div class="advisor-img pb-2">
+                        <img src="../public/images/user_avatar.png" alt="" width="80">
+                    </div>
+                    <div class="advisor-fullname">
+                        <p>Имя: ${advisor.full_name}</p>
+                    </div>
+                    <div class="advisor-country">
+                        <p>Страна: ${advisor.country}</p>
+                    </div>
+                    <div class="advisor-language">
+                        <p>Язык: ${advisor.language}</p>
+                    </div>
+                    <div class="advisor-uni">
+                        <p>ВУЗ: ${advisor.university ? advisor.university : 'Неизвестно'}</p>
+                    </div>
+                    <div class="advisor-check">
+                        <button class="btn btn-outline-primary">Check profile</button>
+                    </div>
+                </div>
+                `
+                $('#advisors_list').append(advisorCard)
+            });
+        }
+
+        function filterAdvisors() {
+            const countryFilter = $('#search_country').val().toLowerCase();
+            const uniFilter = $('#search_uni').val().toLowerCase();
+
+            const filteredAdvisors = advisors.filter(advisor => {
+                const matchesCountry = advisor.country && advisor.country.toLowerCase().includes(countryFilter);
+                const matchesUni = advisor.university && advisor.university.toLowerCase().includes(uniFilter);
+
+                if (!countryFilter && !uniFilter) {
+                    return true;
+                }
+
+                const isCountryMatch = countryFilter ? matchesCountry : true;
+                const isUniMatch = uniFilter ? matchesUni : true;
+
+                return isCountryMatch && isUniMatch;
+            });
+
+            showAdvisors(filteredAdvisors);
+        }
+
+
 
         const countries = [
             "Афганистан", "Албания", "Алжир", "Андорра", "Ангола", "Антигуа и Барбуда",
@@ -230,7 +311,7 @@
             "Эритрея", "Эстония", "Эсватини", "Эфиопия", "Фиджи", "Финляндия",
             "Франция", "Габон", "Гамбия", "Грузия", "Германия", "Гана",
             "Греция", "Гренада", "Грета", "Гвинея", "Гвинея-Бисау", "Гайана",
-            "Гаити", "Гондурас", "Венгрия", "Исландия", "Индия", "Индонезия",
+            "Гаити", "Гондурас", "Венгрия", "Исландия", "Испания", "Индия", "Индонезия",
             "Иран", "Ирак", "Ирландия", "Израиль", "Италия", "Ямайка",
             "Япония", "Иордания", "Казахстан", "Кения", "Кирибати", "Кувейт",
             "Кыргызстан", "Лаос", "Латвия", "Ливан", "Лесото", "Либерия",
@@ -245,13 +326,14 @@
             "Сент-Люсия", "Сент-Винсент и Гренадины", "Самоа", "Сан-Марино", "Сан-Томе и Принсипи",
             "Саудовская Аравия", "Сенегал", "Сербия", "Сейшелы", "Сьерра-Леоне", "Сингапур",
             "Словакия", "Словения", "Соломоновы Острова", "Сомали", "Южноафриканская Республика", "Южная Корея",
-            "Южный Судан", "Испания", "Шри-Ланка", "Судан", "Суринам", "Швеция",
+            "Южный Судан", "Шри-Ланка", "Судан", "Суринам", "Швеция",
             "Швейцария", "Сирия", "Таджикистан", "Танзания", "Таиланд", "Тимор-Лесте",
             "Того", "Тонга", "Тринидад и Тобаго", "Тунис", "Турция", "Туркменистан",
             "Тувалу", "Уганда", "Украина", "Объединенные Арабские Эмираты", "Великобритания", "Соединенные Штаты Америки (США)",
             "Уругвай", "Узбекистан", "Вануату", "Ватикан", "Венесуэла", "Вьетнам",
             "Йемен", "Замбия", "Зимбабве"
         ];
+        countries.sort((a, b) => a.localeCompare(b, 'ru'));
 
         const universities = [
             "Аль-Фараби Казахский Национальный Университет", "Назарбаев Университет", "Казахский Национальный Университет имени аль-Фараби",
@@ -271,7 +353,7 @@
             "Университет Калифорнии в Санта-Барбаре", "Университет Вирджинии",
             "Корнеллский университет", "Дьюкский университет", "Университет Калифорнии в Ирвайне",
             "Университет Цюриха", "Университет Бонна", "Университет Лейпцига",
-            "Мюнхенский технический университет", "Фрайбургский университет", "Национальный университет Сеула",
+            "Мюнхенский технический университет", "Фрайбургский университет", "Сеульский национальный университет",
             "Академия художеств в Вене", "Гамбургский университет", "Университет Кембриджа",
             "Университет Жерарделя", "Лондонский университет", "Сорбонна",
             "Университет Малаги", "Университет Тулона", "Университет Алькала",
@@ -310,12 +392,12 @@
         $(document).ready(function () {
             $('#search_country').on('focus', () => {
                 $('.countries-list').slideDown(300);
-                populateCountriesList(''); // Показать все страны при фокусе
+                populateCountriesList('');
             });
 
             $('#search_country').on('input', function () {
                 const filter = $(this).val();
-                populateCountriesList(filter); // Фильтровать страны при вводе текста
+                populateCountriesList(filter);
             });
 
             function populateCountriesList(filter) {
@@ -330,12 +412,12 @@
 
             $('#search_uni').on('focus', () => {
                 $('.universities-list').slideDown(300);
-                populateUniversitiesList(''); // Показать все университеты при фокусе
+                populateUniversitiesList('');
             });
 
             $('#search_uni').on('input', function () {
                 const filter = $(this).val();
-                populateUniversitiesList(filter); // Фильтровать университеты при вводе текста
+                populateUniversitiesList(filter);
             });
 
             function populateUniversitiesList(filter) {
@@ -380,172 +462,6 @@
                 }
             });
         });
-
-
-
-
-        function showNews() {
-            $('.content-body').html('');
-            $.ajax({
-                url: '/news/get-all', method: 'get', success: function (data) {
-                    var news_data = JSON.parse(data);
-                    globalNews = JSON.parse(data)
-                    news_data.forEach((news) => {
-                        var newsDiv = $("<div>").addClass("news");
-                        var image = $("<img>").attr("src", news.image_url ? news.image_url : '/public/images/default_news.png').attr("alt", "");
-                        var newsTitle = $("<div>").addClass("news-title");
-                        var title = $("<h3>").text(news.title).addClass("clickable-title");
-                        // title.on('click', function () {
-                        //     alert(news.news_id)
-                        // });
-                        var newsContent = $("<div>").addClass("news-content");
-                        var dropdownHTML = `
-                        <% if (role=='admin' ) { %>
-                            <button type="button" class="btn btn-light dropdown-toggle d-flex" data-bs-toggle="dropdown" style="float:right;">
-                            <div class="more_icon d-flex">
-                                <span class="material-symbols-outlined d-flex" style="font-size: 25px; font-weight: 900;">
-                                more_horiz
-                                </span>
-                            </div>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#" onclick="showEditNewsModal('${news.news_id}')"><%=L('index9', language, 'Edit') %></a>
-                                <a class="dropdown-item" href="#" onclick="showDeleteNewsModal('${news.news_id}')"><%=L('index13', language, 'Delete') %></a>
-                            </div>
-                        <% } %>
-                       
-                        `;
-                        var newsText = $("<div>").addClass("news-text").text(news.text);
-                        newsTitle.append(title);
-                        newsContent.append(newsTitle, newsText)
-                        newsDiv.append(image, newsContent, dropdownHTML);
-
-                        $('.content-body').append(newsDiv);
-                    });
-                }, error: function (err) {
-                    console.log(err)
-                }
-            })
-        }
-
-
-
-        function showAddNewsModal() {
-            $('#create_news-modal').modal('show');
-        }
-
-        function createNews() {
-            let img = $('#news_img')[0].files[0];
-            let title = $('#news_title').val().trim();
-            let text = $('#news_text').val().trim();
-
-            if (!(title && text)) {
-                $.ambiance({
-                    message: "<%=L('index14', language, 'Please provide a title and text for the news') %>.",
-                    type: "error",
-                    fade: true,
-                    width: 400
-                });
-                return;
-            }
-
-            loading(2, el = '#add_news_btn');
-
-            const formData = new FormData();
-            formData.append('img', img);
-            formData.append('title', title);
-            formData.append('text', text);
-
-            $.ajax({
-                url: "/news/create", method: 'post', data: formData, processData: false, contentType: false, success: function (r) {
-                    $('#create_news-modal').modal('hide');
-                    loading(20, el = '#add_news_btn');
-                    $.ambiance({
-                        message: "<%=L('index15', language, 'News added') %>!",
-                        type: "success",
-                        fade: true
-                    });
-                    loading(1);
-                    showNews();
-                    loading(0);
-                },
-                error: function (err) {
-                    console.log(err);
-                }
-            });
-        }
-
-        function showEditNewsModal(news_id) {
-            globalNewsId = news_id;
-            var selected_news = globalNews.filter(function (news) {
-                return news.news_id == globalNewsId
-            })
-            $('#new_news_title').val(selected_news[0].title);
-            $('#new_news_text').val(selected_news[0].text);
-            $('#edit_news-modal').modal('show');
-        }
-
-
-        function editNews() {
-            let img = $('#new_news_img')[0].files[0];
-            let title = $('#new_news_title').val().trim();
-            let text = $('#new_news_text').val().trim();
-
-            loading(2, el = '#edit_news_btn');
-
-            const formData = new FormData();
-            formData.append('img', img);
-            formData.append('title', title);
-            formData.append('text', text);
-            formData.append('news_id', globalNewsId);
-
-            $.ajax({
-                url: "/news/edit", method: 'post', data: formData, processData: false, contentType: false, success: function (r) {
-                    $('#edit_news-modal').modal('hide');
-                    loading(20, el = '#edit_news_btn');
-                    $.ambiance({
-                        message: "<%=L('index16', language, 'News updated') %>!",
-                        type: "success",
-                        fade: true
-                    });
-                    loading(1);
-                    showNews();
-                    loading(0);
-                },
-                error: function (err) {
-                    console.log(err);
-                }
-            });
-        }
-
-        function showDeleteNewsModal(news_id) {
-            globalNewsId = news_id;
-            $('#delete_news-modal').modal('show');
-        }
-
-        function deleteNews() {
-            loading(2, el = '#delete_news_btn');
-            $.ajax({
-                url: '/news/delete',
-                method: 'POST',
-                data: { news_id: globalNewsId },
-                dataType: 'json',
-                success: function (res) {
-                    if (res.r) {
-                        $.ambiance({
-                            message: "<%=L('index17', language, 'Deleted') %>!",
-                            type: "success",
-                            fade: true
-                        });
-                        loading(1);
-                        showNews();
-                        loading(0);
-                    }
-                    $('#delete_news-modal').modal('hide');
-                    loading(20, el = "#delete_news_btn");
-                }
-            })
-        }
 
     </script>
 </body>
