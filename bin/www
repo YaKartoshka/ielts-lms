@@ -9,7 +9,7 @@ const firebase = require('../libs/firebase_db');
 const fdb = firebase.fdb;
 const fauth = firebase.fauth;
 const express = require('express');
-
+const request = require('request')
 var app = require("../app");
 var http = require("http");
 var https = require('https');
@@ -114,7 +114,7 @@ decode = function (str, shift) {
   return encode(str, 26 - shift);
 }
 
-requestAI = function(text, language, url) {
+requestAI = function(text) {
     return new Promise((resolve, reject) => {
         var options = {
             method: 'POST',
@@ -127,32 +127,52 @@ requestAI = function(text, language, url) {
                     {
                         "parts": [
                             {
-                                "text": `Создайте краткое и интересное резюме текста '${text}' на ${language == 'ru' ? 'русском' : 'казахском'} языке.
-                                * Максимальное количество слов: 100.
-                                * Количество предложений: 4.
-                                * ${language == 'ru' ? 'Русский' : 'Казахский'} язык
-                                * Строго соблюдайте лимит слов. 
-                                * Добавьте один релевантный эмодзи после заголовка. 
-                                * Используйте HTML структуру согласно шаблону. 
-                                * Заголовок должен быть оформлен тегами <b></b>.`}
+                                "text": `Оцени текст для IELTS writing, дай хорошую обратную связь.
+                                * Используйте JSON структуру для output с полями grade, feedback, improvements. 
+                                * Text: ${text}
+                                * Оценка в формате IELTS с цифрами
+                                ` 
+                                }
                         ]
                     }
                 ]
             })
         };
 
-        request(options, function (error, response) {
+        function validateJson(data) {
+            try {
+                JSON.parse(data);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function handleResponse(error, response) {
             if (error) {
                 reject(error);
             } else {
+                let jsonData;
                 try {
-                    var data = JSON.parse(response.body);
-                    var sum = data.candidates[0].content.parts[0].text;
-                    resolve(sum);
+                  console.log(response)
+                    var resp = JSON.parse(response.body)
+                    
+                    var scenario_json = resp.candidates[0].content.parts[0].text
+                    let jsonData = scenario_json.replace(/json/g, '').replace(/```/g, '');
+
+                    console.log(jsonData)
+                    if (validateJson(jsonData)) {
+                        resolve(jsonData);
+                    } else {
+                        console.log("Invalid JSON, retrying...");
+                        requestAI(text).then(resolve).catch(reject);
+                    }
                 } catch (parseError) {
                     reject(parseError);
                 }
             }
-        });
+        }
+
+        request(options, handleResponse);
     });
 }
