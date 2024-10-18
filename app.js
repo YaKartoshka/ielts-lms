@@ -11,6 +11,7 @@ var passport = require('passport');
 var index = require('./routes/index');
 var auth = require('./routes/auth');
 var speaking = require('./routes/speaking');
+var writing = require('./routes/writing');
 require('./libs/translate')
 //html ejs
 app.set('views', path.join(__dirname, 'views'));
@@ -41,7 +42,8 @@ app.use(passport.session());
 // -- routes --
 app.use('/', index);
 app.use('/auth', auth);
-app.use('/speaking', speaking)
+app.use('/speaking', speaking);
+app.use('/writing', writing);
 
 
 
