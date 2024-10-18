@@ -31,6 +31,10 @@ router.get('/reading', (req, res) => {
     res.render('reading', { role: req.session.role, L:L, language: req.cookies.language ? req.cookies.language : 'en' });
 });
 
+router.get('/advisory', (req, res) => {
+    res.render('advisory', { role: req.session.role, L:L, language: req.cookies.language ? req.cookies.language : 'en' });
+});
+
 
 
 router.post('/', (req,res)=>{

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%=L('index1', language, 'News' ) %>
+    </title>
+    <link rel="shortcut icon" href="../public/images/Favicon.png" type="image/x-icon">
+    <%- include('./components/head.ejs.html') %>
+        <style>
+            .content-body {
+                margin: 10px 0;
+                max-height: 600px;
+                overflow-y: auto;
+                padding: 10px;
+            }
+
+            ::-webkit-scrollbar {
+                width: 4px;
+                /* Width of the entire scrollbar */
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background-color: #888;
+                border-radius: 5px;
+            }
+
+            .news-content {
+                max-height: 270px;
+                overflow-y: auto;
+            }
+        </style>
+</head>
+
+<body>
+    <header>
+
+        <div class="logo d-flex align-items-center">
+            <span class="material-symbols-outlined btn btn-light px-2 py-0 me-3 burger-menu" style="display: none;"
+                onclick="toggleMenu()">
+                menu
+            </span>
+
+            <a href="/"><img src="/public/images/CoachMate.png" alt=""></a>
+        </div>
+        <%- include('./components/profile_bar.ejs.html') %>
+    </header>
+    <main>
+        <%- include('./components/nav_bar.ejs.html') %>
+            <div class="content">
+                <div class="content-head p-3 element-box">
+                    <h4>Найдите консультацию по стране/университету</h4>
+                </div>
+
+                <div class="content-body p-3 element-box">
+                    <h6>Поиск по:</h6>
+                    <div class="searching-block d-flex justify-content-between">
+                        <div class="search-country">
+                            <input type="text" class="form-control" id="search_country" placeholder="Cтранам">
+                            <div class="countries-list">
+                                <ul id="countries-list-ul"></ul>
+                            </div>
+                        </div>
+
+                        <div class="search-uni">
+                            <input type="text" class="form-control" id="search_uni" placeholder="Университетам">
+                            <div class="universities-list">
+                                <ul id="universities-list-ul"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="searching-btn mt-3">
+                        <button class="btn btn-primary">Поиск</button>
+                    </div>
+                </div>
+            </div>
+
+    </main>
+    <footer></footer>
+
+    <!-- MODALS -->
+    <div class="modal fade" id="create_news-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <%=L('index2', language, 'Add News' ) %>
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form autocomplete="off">
+                        <div class="mb-3 mt-2">
+                            <label class="mb-2">
+                                <%=L('index3', language, 'News Image' ) %>
+                            </label>
+                            <input type="file" class="form-control" id="news_img" placeholder="Title" accept="image/*">
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label class="mb-2">
+                                <%=L('index4', language, 'News title' ) %>
+                            </label>
+                            <input type="text" class="form-control" id="news_title" placeholder="Title">
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label class="mb-2">
+                                <%=L('index5', language, 'News text' ) %>
+                            </label>
+                            <textarea id="news_text" cols="30" rows="4" class="form-control"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="add_news_btn" class="btn btn-primary px-md-4" onclick="createNews()">
+                        <%=L('index6', language, 'Add' ) %>
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                        <%=L('index7', language, 'Close' ) %>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="edit_news-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <%=L('index8', language, 'Edit News' ) %>
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form autocomplete="off">
+                        <div class="mb-3 mt-2">
+                            <label class="mb-2">
+                                <%=L('index3', language, 'News Image' ) %>
+                            </label>
+                            <input type="file" class="form-control" id="new_news_img" accept="image/*">
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label class="mb-2">
+                                <%=L('index4', language, 'News title' ) %>
+                            </label>
+                            <input type="text" class="form-control" id="new_news_title" placeholder="Title">
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label class="mb-2">
+                                <%=L('index5', language, 'News text' ) %>
+                            </label>
+                            <textarea id="new_news_text" cols="30" rows="4" class="form-control"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="edit_news_btn" class="btn btn-primary px-md-4" onclick="editNews()">
+                        <%=L('index9', language, 'Edit' ) %>
+                    </button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        <%=L('index10', language, 'Cancel' ) %>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete_news-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <%=L('index11', language, 'Delete News' ) %>
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <%=L('index12', language, "You won't be able to revert this. Are you sure?" ) %>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="delete_news_btn" class="btn btn-danger px-md-4" onclick="deleteNews()">
+                        <%=L('index13', language, 'Delete' ) %>
+                    </button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        <%=L('index10', language, 'Cancel' ) %>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script type="text/javascript" src="https://s2.webapi.ai/chat-widget/uniq-chat.js"></script>
+
+    <script>
+        var ailabs_user_info = {
+            'client': 'c1463',
+            'welcome_message': 'Welcome to the chat 👋',
+            'popup_mode': 0, //0-off, 1-auto popup after 10 seconds for new users
+            'input_comment': 'Type your message or /start to restart'
+        };
+        AILabsChatStart();
+    </script>
+
+
+    <!-- END OF MODALS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var globalNews;
+        var globalNewsId;
+
+        $(document).ready(function () {
+            loading(1);
+            loading(0);
+        });
+
+        const countries = [
+            "Афганистан", "Албания", "Алжир", "Андорра", "Ангола", "Антигуа и Барбуда",
+            "Аргентина", "Армения", "Австралия", "Австрия", "Азербайджан", "Багамы",
+            "Бахрейн", "Бангладеш", "Барбадос", "Беларусь", "Бельгия", "Белиз",
+            "Бенин", "Бутан", "Боливия", "Босния и Герцеговина", "Ботсвана", "Бразилия",
+            "Бруней", "Болгария", "Буркина-Фасо", "Бурунди", "Кабо-Верде", "Камбоджа",
+            "Камерун", "Канада", "Центральноафриканская Республика", "Чад", "Чили", "Китай",
+            "Колумбия", "Коморы", "Конго", "Коста-Рика", "Хорватия", "Куба",
+            "Кипр", "Чехия", "Демократическая Республика Конго", "Дания", "Джибути",
+            "Доминика", "Доминиканская Республика", "Эквадор", "Египет", "Сальвадор", "Экваториальная Гвинея",
+            "Эритрея", "Эстония", "Эсватини", "Эфиопия", "Фиджи", "Финляндия",
+            "Франция", "Габон", "Гамбия", "Грузия", "Германия", "Гана",
+            "Греция", "Гренада", "Грета", "Гвинея", "Гвинея-Бисау", "Гайана",
+            "Гаити", "Гондурас", "Венгрия", "Исландия", "Индия", "Индонезия",
+            "Иран", "Ирак", "Ирландия", "Израиль", "Италия", "Ямайка",
+            "Япония", "Иордания", "Казахстан", "Кения", "Кирибати", "Кувейт",
+            "Кыргызстан", "Лаос", "Латвия", "Ливан", "Лесото", "Либерия",
+            "Ливия", "Лихтенштейн", "Литва", "Люксембург", "Мадагаскар", "Малави",
+            "Малайзия", "Мальдивы", "Мали", "Мальта", "Маршалловы Острова", "Мавритания",
+            "Маврикий", "Мексика", "Микронезия", "Молдова", "Монако", "Монголия",
+            "Черногория", "Марокко", "Мозамбик", "Мьянма", "Намибия", "Науру",
+            "Непал", "Нидерланды", "Новая Зеландия", "Никарагуа", "Нигер", "Нигерия",
+            "Северная Македония", "Норвегия", "Оман", "Пакистан", "Палау", "Палестина",
+            "Панама", "Папуа-Новая Гвинея", "Парагвай", "Перу", "Филиппины", "Польша",
+            "Португалия", "Катар", "Румыния", "Россия", "Руанда", "Сент-Китс и Невис",
+            "Сент-Люсия", "Сент-Винсент и Гренадины", "Самоа", "Сан-Марино", "Сан-Томе и Принсипи",
+            "Саудовская Аравия", "Сенегал", "Сербия", "Сейшелы", "Сьерра-Леоне", "Сингапур",
+            "Словакия", "Словения", "Соломоновы Острова", "Сомали", "Южноафриканская Республика", "Южная Корея",
+            "Южный Судан", "Испания", "Шри-Ланка", "Судан", "Суринам", "Швеция",
+            "Швейцария", "Сирия", "Таджикистан", "Танзания", "Таиланд", "Тимор-Лесте",
+            "Того", "Тонга", "Тринидад и Тобаго", "Тунис", "Турция", "Туркменистан",
+            "Тувалу", "Уганда", "Украина", "Объединенные Арабские Эмираты", "Великобритания", "Соединенные Штаты Америки (США)",
+            "Уругвай", "Узбекистан", "Вануату", "Ватикан", "Венесуэла", "Вьетнам",
+            "Йемен", "Замбия", "Зимбабве"
+        ];
+
+        const universities = [
+            "Аль-Фараби Казахский Национальный Университет", "Назарбаев Университет", "Казахский Национальный Университет имени аль-Фараби",
+            "Astana IT University", "Евразийский Национальный Университет",
+            "Массачусетский технологический институт (MIT)", "Гарвардский университет", "Стэнфордский университет",
+            "Кембриджский университет", "Оксфордский университет", "Калифорнийский университет в Беркли",
+            "Имперский колледж Лондона", "Чикагский университет", "Колумбийский университет",
+            "Токийский университет", "Университет Торонто", "Университет Вашингтона",
+            "Университет Мельбурна", "Университет Сиднея", "Пекинский университет",
+            "Университет Гонконга", "Сингапурский национальный университет", "Национальный университет Сингапура",
+            "Шанхайский университет", "Университет Цинхуа", "Университет Тель-Авив",
+            "Квинслендский университет", "Университет Саскачевана", "Университет Флориды",
+            "Университет Лос-Анджелеса", "Нью-Йоркский университет", "Сан-Диегский университет",
+            "Техасский университет в Остине", "Университет Висконсина", "Университет Мичигана",
+            "Университет Британской Колумбии", "Университет Хельсинки", "Университет Осло",
+            "Национальный университет Южной Кореи", "Копенгагенский университет", "Афины",
+            "Университет Калифорнии в Санта-Барбаре", "Университет Вирджинии",
+            "Корнеллский университет", "Дьюкский университет", "Университет Калифорнии в Ирвайне",
+            "Университет Цюриха", "Университет Бонна", "Университет Лейпцига",
+            "Мюнхенский технический университет", "Фрайбургский университет", "Национальный университет Сеула",
+            "Академия художеств в Вене", "Гамбургский университет", "Университет Кембриджа",
+            "Университет Жерарделя", "Лондонский университет", "Сорбонна",
+            "Университет Малаги", "Университет Тулона", "Университет Алькала",
+            "Магдебургский университет", "Университет Граца", "Университет Трента",
+            "Флорентийский университет", "Университет Боккони", "Миланский университет",
+            "Университет Аалто", "Университет Лаппеенранта", "Старый университет Лейдена",
+            "Университет Дрездена", "Университет Фридриха Шиллера", "Университет Неймегена",
+            "Университет Тюбингена", "Университет Котбуса", "Университет Майнца",
+            "Университет Висконсина в Мадисоне", "Технический университет Мюнхена", "Университет Падуи",
+            "Лейденский университет", "Гронингенский университет", "Университет Роттердама",
+            "Университет Гента", "Университет Антверпена", "Университет Брауна",
+            "Университет Рочестера", "Университет Беркли", "Университет Мэриленда",
+            "Университет Рутгерса", "Университет Теннесси", "Университет Западного Онтарио",
+            "Университет Дельфта", "Технический университет Эйндховена", "Университет Сарыарка",
+            "Калифорнийский университет в Сан-Диего", "Гарвардская школа бизнеса", "Кембриджская школа бизнеса",
+            "Университет Аделаиды", "Университет Британской Колумбии", "Университет Ватерлоо",
+            "Университет Техаса в Остине", "Университет Северной Каролины в Чапел-Хилл",
+            "Университет Оклахомы", "Университет Кентукки", "Университет Небраски",
+            "Университет Джорджа Вашингтона", "Университет Коннектикута", "Университет Питтсбурга",
+            "Университет Руниона", "Университет Стратклайда", "Университет Крейга",
+            "Университет Ньюкасла", "Университет Шеффилда", "Университет Кента",
+            "Университет Лидса", "Университет Бата", "Университет Лафборо",
+            "Университет Гонконгского политехнического университета", "Университет Калифорнии в Дэвисе",
+            "Университет Рис", "Университет Нотр-Дам", "Университет Теннесси в Ноксвилле",
+            "Университет Брауна", "Университет Станфорда", "Университет Карнеги-Меллона",
+            "Университет Лиона", "Университет Реймса", "Университет Тулузы",
+            "Университет Париж 1 Пантеон-Сорбонна", "Университет Париж 2 Пантеон-Ассас",
+            "Университет Осло", "Университет Гронинген", "Университет Триеста",
+            "Университет Пизы", "Университет Павии", "Университет Неаполя",
+            "Университет Копенгагена", "Университет Лаусаны", "Университет Цюриха",
+            "Университет Роттердама", "Университет Кельна", "Университет Гамбурга",
+            "Университет Фрейбурга", "Университет Калифорнии в Санта-Крузе", "Университет Сиднея"
+        ];
+
+
+        $(document).ready(function () {
+            $('#search_country').on('focus', () => {
+                $('.countries-list').slideDown(300);
+                populateCountriesList(''); // Показать все страны при фокусе
+            });
+
+            $('#search_country').on('input', function () {
+                const filter = $(this).val();
+                populateCountriesList(filter); // Фильтровать страны при вводе текста
+            });
+
+            function populateCountriesList(filter) {
+                const filteredCountries = countries.filter(country =>
+                    country.toLowerCase().includes(filter.toLowerCase())
+                );
+                $('#countries-list-ul').empty();
+                filteredCountries.forEach(country => {
+                    $('#countries-list-ul').append(`<li>${country}</li>`);
+                });
+            }
+
+            $('#search_uni').on('focus', () => {
+                $('.universities-list').slideDown(300);
+                populateUniversitiesList(''); // Показать все университеты при фокусе
+            });
+
+            $('#search_uni').on('input', function () {
+                const filter = $(this).val();
+                populateUniversitiesList(filter); // Фильтровать университеты при вводе текста
+            });
+
+            function populateUniversitiesList(filter) {
+                const filteredUniversities = universities.filter(university =>
+                    university.toLowerCase().includes(filter.toLowerCase())
+                );
+                $('#universities-list-ul').empty();
+                filteredUniversities.forEach(university => {
+                    $('#universities-list-ul').append(`<li>${university}</li>`);
+                });
+            }
+
+            $(document).on('click', function (event) {
+                if (!$(event.target).closest('.search-country').length) {
+                    $('.countries-list').slideUp(300);
+                }
+                if (!$(event.target).closest('.search-uni').length) {
+                    $('.universities-list').slideUp(300);
+                }
+            });
+
+            $(document).on('click', '.countries-list li', function () {
+                $('#search_country').val($(this).text());
+                $('.countries-list').slideUp(300);
+            });
+
+            $(document).on('click', '.universities-list li', function () {
+                $('#search_uni').val($(this).text());
+                $('.universities-list').slideUp(300);
+            });
+
+            var currentUrl = window.location.pathname;
+            $(".nav-bar ul li").each(function () {
+                var listItem = $(this);
+                var listItemLink = listItem.find("a");
+                var listItemHref = listItemLink.attr("href");
+
+                if (currentUrl === listItemHref) {
+                    listItem.addClass("active");
+                } else {
+                    listItem.removeClass("active");
+                }
+            });
+        });
+
+
+
+
+        function showNews() {
+            $('.content-body').html('');
+            $.ajax({
+                url: '/news/get-all', method: 'get', success: function (data) {
+                    var news_data = JSON.parse(data);
+                    globalNews = JSON.parse(data)
+                    news_data.forEach((news) => {
+                        var newsDiv = $("<div>").addClass("news");
+                        var image = $("<img>").attr("src", news.image_url ? news.image_url : '/public/images/default_news.png').attr("alt", "");
+                        var newsTitle = $("<div>").addClass("news-title");
+                        var title = $("<h3>").text(news.title).addClass("clickable-title");
+                        // title.on('click', function () {
+                        //     alert(news.news_id)
+                        // });
+                        var newsContent = $("<div>").addClass("news-content");
+                        var dropdownHTML = `
+                        <% if (role=='admin' ) { %>
+                            <button type="button" class="btn btn-light dropdown-toggle d-flex" data-bs-toggle="dropdown" style="float:right;">
+                            <div class="more_icon d-flex">
+                                <span class="material-symbols-outlined d-flex" style="font-size: 25px; font-weight: 900;">
+                                more_horiz
+                                </span>
+                            </div>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#" onclick="showEditNewsModal('${news.news_id}')"><%=L('index9', language, 'Edit') %></a>
+                                <a class="dropdown-item" href="#" onclick="showDeleteNewsModal('${news.news_id}')"><%=L('index13', language, 'Delete') %></a>
+                            </div>
+                        <% } %>
+                       
+                        `;
+                        var newsText = $("<div>").addClass("news-text").text(news.text);
+                        newsTitle.append(title);
+                        newsContent.append(newsTitle, newsText)
+                        newsDiv.append(image, newsContent, dropdownHTML);
+
+                        $('.content-body').append(newsDiv);
+                    });
+                }, error: function (err) {
+                    console.log(err)
+                }
+            })
+        }
+
+
+
+        function showAddNewsModal() {
+            $('#create_news-modal').modal('show');
+        }
+
+        function createNews() {
+            let img = $('#news_img')[0].files[0];
+            let title = $('#news_title').val().trim();
+            let text = $('#news_text').val().trim();
+
+            if (!(title && text)) {
+                $.ambiance({
+                    message: "<%=L('index14', language, 'Please provide a title and text for the news') %>.",
+                    type: "error",
+                    fade: true,
+                    width: 400
+                });
+                return;
+            }
+
+            loading(2, el = '#add_news_btn');
+
+            const formData = new FormData();
+            formData.append('img', img);
+            formData.append('title', title);
+            formData.append('text', text);
+
+            $.ajax({
+                url: "/news/create", method: 'post', data: formData, processData: false, contentType: false, success: function (r) {
+                    $('#create_news-modal').modal('hide');
+                    loading(20, el = '#add_news_btn');
+                    $.ambiance({
+                        message: "<%=L('index15', language, 'News added') %>!",
+                        type: "success",
+                        fade: true
+                    });
+                    loading(1);
+                    showNews();
+                    loading(0);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        function showEditNewsModal(news_id) {
+            globalNewsId = news_id;
+            var selected_news = globalNews.filter(function (news) {
+                return news.news_id == globalNewsId
+            })
+            $('#new_news_title').val(selected_news[0].title);
+            $('#new_news_text').val(selected_news[0].text);
+            $('#edit_news-modal').modal('show');
+        }
+
+
+        function editNews() {
+            let img = $('#new_news_img')[0].files[0];
+            let title = $('#new_news_title').val().trim();
+            let text = $('#new_news_text').val().trim();
+
+            loading(2, el = '#edit_news_btn');
+
+            const formData = new FormData();
+            formData.append('img', img);
+            formData.append('title', title);
+            formData.append('text', text);
+            formData.append('news_id', globalNewsId);
+
+            $.ajax({
+                url: "/news/edit", method: 'post', data: formData, processData: false, contentType: false, success: function (r) {
+                    $('#edit_news-modal').modal('hide');
+                    loading(20, el = '#edit_news_btn');
+                    $.ambiance({
+                        message: "<%=L('index16', language, 'News updated') %>!",
+                        type: "success",
+                        fade: true
+                    });
+                    loading(1);
+                    showNews();
+                    loading(0);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        function showDeleteNewsModal(news_id) {
+            globalNewsId = news_id;
+            $('#delete_news-modal').modal('show');
+        }
+
+        function deleteNews() {
+            loading(2, el = '#delete_news_btn');
+            $.ajax({
+                url: '/news/delete',
+                method: 'POST',
+                data: { news_id: globalNewsId },
+                dataType: 'json',
+                success: function (res) {
+                    if (res.r) {
+                        $.ambiance({
+                            message: "<%=L('index17', language, 'Deleted') %>!",
+                            type: "success",
+                            fade: true
+                        });
+                        loading(1);
+                        showNews();
+                        loading(0);
+                    }
+                    $('#delete_news-modal').modal('hide');
+                    loading(20, el = "#delete_news_btn");
+                }
+            })
+        }
+
+    </script>
+</body>
+
+</html>

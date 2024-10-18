@@ -180,7 +180,7 @@ body {
     flex: 1;
 }
 
-.knowledge-test { 
+.knowledge-test {
     background-color: #FFFFFF;
     border-radius: 20px;
     flex: 0.45;
@@ -198,6 +198,10 @@ body {
 .knowledge-test .test-grade {
     position: absolute;
     bottom: 5px;
+}
+
+.tasks .task-card {
+    width: 250px;
 }
 
 .courses-list {
@@ -221,12 +225,48 @@ body {
     width: 300px;
 }
 
+.searching-block input {
+    width: 600px;
+}
+
+.search-country .input-box,
+.search-uni .input-box {
+    position: relative;
+}
+
+.countries-list,
+.universities-list {
+    position: absolute;
+    background-color: #fff;
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 18%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.countries-list li,
+.universities-list li {
+    pointer-events: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+}
+
+.countries-list ul li,
+.universities-list ul li {
+    color: black;
+    pointer-events: auto;
+}
+
+.countries-list ul li:hover,
+.universities-list ul li:hover {
+    background-color: #e2eef9;
+    cursor: pointer;
+}
+
 /* Home end */
 
-/* reading */
-
-
-/* reading end */
 
 .news {
     margin: 40px auto;
