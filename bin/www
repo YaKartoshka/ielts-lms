@@ -4,7 +4,7 @@ var args = process.argv.slice(2);
 config = args[0];
 run_mode = args[1];
 require("../config/" + config); //global config -> conf
-require('dotenv')
+require('dotenv').config();
 const firebase = require('../libs/firebase_db');
 const fdb = firebase.fdb;
 const fauth = firebase.fauth;
@@ -20,10 +20,10 @@ run_mode = args[1];
 
 
 
-  var server = http.createServer(app);
-  server.listen(conf.port);
-  server.on("error", onError);
-  
+var server = http.createServer(app);
+server.listen(conf.port);
+server.on("error", onError);
+
 
 
 

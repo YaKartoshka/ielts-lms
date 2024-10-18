@@ -46,102 +46,16 @@
         <%- include('./components/nav_bar.ejs.html') %>
             <div class="content">
                 <div class="content-head p-3 element-box">
-                    <h4><%=L('index1', language, 'Welcome') %></h4>
+                    <h4>AI Realtime API with Voice Detection</h4>
+                    <button id="start-detection" class="btn btn-light"><img src="https://www.pngarts.com/files/2/Play-PNG-Download-Image.png" width="20" alt=""></button>
+
                 </div>
-              
-                <div class="content-body">
-                    
+                <div class="content-body element-box">
+                    <div id="messageContainer" class="mt-1"></div>
                 </div>
             </div>
-            
     </main>
     <footer></footer>
-
-    <!-- MODALS -->
-    <div class="modal fade" id="create_news-modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><%=L('index2', language, 'Add News') %></h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form autocomplete="off">
-                        <div class="mb-3 mt-2">
-                            <label class="mb-2"><%=L('index3', language, 'News Image') %></label>
-                            <input type="file" class="form-control" id="news_img" placeholder="Title" accept="image/*">
-                        </div>
-                        <div class="mb-3 mt-3">
-                            <label class="mb-2"><%=L('index4', language, 'News title') %></label>
-                            <input type="text" class="form-control" id="news_title" placeholder="Title">
-                        </div>
-                        <div class="mb-3 mt-3">
-                            <label class="mb-2"><%=L('index5', language, 'News text') %></label>
-                            <textarea id="news_text" cols="30" rows="4" class="form-control"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="add_news_btn" class="btn btn-primary px-md-4"
-                        onclick="createNews()"><%=L('index6', language, 'Add') %></button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><%=L('index7', language, 'Close') %></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="edit_news-modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><%=L('index8', language, 'Edit News') %></h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form autocomplete="off">
-                        <div class="mb-3 mt-2">
-                            <label class="mb-2"><%=L('index3', language, 'News Image') %></label>
-                            <input type="file" class="form-control" id="new_news_img" accept="image/*">
-                        </div>
-                        <div class="mb-3 mt-3">
-                            <label class="mb-2"><%=L('index4', language, 'News title') %></label>
-                            <input type="text" class="form-control" id="new_news_title" placeholder="Title">
-                        </div>
-                        <div class="mb-3 mt-3">
-                            <label class="mb-2"><%=L('index5', language, 'News text') %></label>
-                            <textarea id="new_news_text" cols="30" rows="4" class="form-control"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="edit_news_btn" class="btn btn-primary px-md-4"
-                        onclick="editNews()"><%=L('index9', language, 'Edit') %></button>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><%=L('index10', language, 'Cancel') %></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="delete_news-modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><%=L('index11', language, 'Delete News') %></h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <%=L('index12', language, "You won't be able to revert this. Are you sure?") %>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="delete_news_btn" class="btn btn-danger px-md-4"
-                        onclick="deleteNews()"><%=L('index13', language, 'Delete') %></button>
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal"><%=L('index10', language, 'Cancel') %></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-   
 
     <script type="text/javascript" src="https://s2.webapi.ai/chat-widget/uniq-chat.js"></script>
 
@@ -161,10 +75,11 @@
     <script>
         var globalNews;
         var globalNewsId;
+        var recordState = true;
 
         $(document).ready(function () {
             loading(1);
-            showNews();
+          
             loading(0);
         });
 
@@ -185,170 +100,133 @@
         });
 
 
-        function showNews() {
-            $('.content-body').html('');
-            $.ajax({
-                url: '/news/get-all', method: 'get', success: function (data) {
-                    var news_data = JSON.parse(data);
-                    globalNews = JSON.parse(data)
-                    news_data.forEach((news) => {
-                        var newsDiv = $("<div>").addClass("news");
-                        var image = $("<img>").attr("src", news.image_url ? news.image_url : '/public/images/default_news.png').attr("alt", "");
-                        var newsTitle = $("<div>").addClass("news-title");
-                        var title = $("<h3>").text(news.title).addClass("clickable-title");
-                        // title.on('click', function () {
-                        //     alert(news.news_id)
-                        // });
-                        var newsContent = $("<div>").addClass("news-content");
-                        var dropdownHTML = `
-                        <% if (role=='admin' ) { %>
-                            <button type="button" class="btn btn-light dropdown-toggle d-flex" data-bs-toggle="dropdown" style="float:right;">
-                            <div class="more_icon d-flex">
-                                <span class="material-symbols-outlined d-flex" style="font-size: 25px; font-weight: 900;">
-                                more_horiz
-                                </span>
-                            </div>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#" onclick="showEditNewsModal('${news.news_id}')"><%=L('index9', language, 'Edit') %></a>
-                                <a class="dropdown-item" href="#" onclick="showDeleteNewsModal('${news.news_id}')"><%=L('index13', language, 'Delete') %></a>
-                            </div>
-                        <% } %>
-                       
-                        `;
-                        var newsText = $("<div>").addClass("news-text").text(news.text);
-                        newsTitle.append(title);
-                        newsContent.append(newsTitle, newsText)
-                        newsDiv.append(image, newsContent, dropdownHTML);
-
-                        $('.content-body').append(newsDiv);
-                    });
-                }, error: function (err) {
-                    console.log(err)
-                }
-            })
-        }
-
        
 
-        function showAddNewsModal() {
-            $('#create_news-modal').modal('show');
-        }
-
-        function createNews() {
-            let img = $('#news_img')[0].files[0];
-            let title = $('#news_title').val().trim();
-            let text = $('#news_text').val().trim();
-
-            if (!(title && text)) {
-                $.ambiance({
-                    message: "<%=L('index14', language, 'Please provide a title and text for the news') %>.",
-                    type: "error",
-                    fade: true,
-                    width: 400
-                });
-                return;
-            }
-
-            loading(2, el = '#add_news_btn');
-
-            const formData = new FormData();
-            formData.append('img', img);
-            formData.append('title', title);
-            formData.append('text', text);
-
-            $.ajax({
-                url: "/news/create", method: 'post', data: formData, processData: false, contentType: false, success: function (r) {
-                    $('#create_news-modal').modal('hide');
-                    loading(20, el = '#add_news_btn');
-                    $.ambiance({
-                        message: "<%=L('index15', language, 'News added') %>!",
-                        type: "success",
-                        fade: true
-                    });
-                    loading(1);
-                    showNews();
-                    loading(0);
-                },
-                error: function (err) {
-                    console.log(err);
-                }
-            });
-        }
-
-        function showEditNewsModal(news_id){
-            globalNewsId = news_id;
-            var selected_news = globalNews.filter(function(news){
-                return news.news_id == globalNewsId
-            })
-            $('#new_news_title').val(selected_news[0].title);
-            $('#new_news_text').val(selected_news[0].text);
-            $('#edit_news-modal').modal('show');
-        }
-
-
-        function editNews(){
-            let img = $('#new_news_img')[0].files[0];
-            let title = $('#new_news_title').val().trim();
-            let text = $('#new_news_text').val().trim();
-
-            loading(2, el = '#edit_news_btn');
-
-            const formData = new FormData();
-            formData.append('img', img);
-            formData.append('title', title);
-            formData.append('text', text);
-            formData.append('news_id', globalNewsId);
-
-            $.ajax({
-                url: "/news/edit", method: 'post', data: formData, processData: false, contentType: false, success: function (r) {
-                    $('#edit_news-modal').modal('hide');
-                    loading(20, el = '#edit_news_btn');
-                    $.ambiance({
-                        message: "<%=L('index16', language, 'News updated') %>!",
-                        type: "success",
-                        fade: true
-                    });
-                    loading(1);
-                    showNews();
-                    loading(0);
-                },
-                error: function (err) {
-                    console.log(err);
-                }
-            });
-        }
-
-        function showDeleteNewsModal(news_id){
-            globalNewsId = news_id;
-            $('#delete_news-modal').modal('show');
-        }
-
-        function deleteNews(){
-            loading(2, el='#delete_news_btn');
-            $.ajax({
-                url: '/news/delete',
-                method: 'POST',
-                data: {news_id:globalNewsId},
-                dataType: 'json',
-                success:function(res){
-                    if(res.r){
-                        $.ambiance({
-                        message: "<%=L('index17', language, 'Deleted') %>!",
-                        type: "success",
-                        fade: true
-                    });
-                    loading(1);
-                    showNews();
-                    loading(0);
-                    }
-                    $('#delete_news-modal').modal('hide');
-                    loading(20, el="#delete_news_btn");
-                }
-            })
-        }
-
     </script>
+
+<script>
+    const startDetectionButton = document.getElementById('start-detection');
+
+    let mediaRecorder, audioContext, analyser, dataArray, silenceTimeout, audioChunks = [];
+    let recording = false;
+    const messageContainer = document.getElementById('messageContainer');
+    const utterance = new SpeechSynthesisUtterance();
+
+    const socket = new WebSocket('ws://localhost:4001');
+
+    socket.onopen = () => {
+      console.log('Connected to server');
+    };
+
+    socket.onclose = () => {
+      console.log('Disconnected from server');
+    };
+
+    socket.onmessage = (event) => {
+      console.log(event)
+      const message = document.createElement('p');
+      message.textContent = `AI: ${event.data}`;
+
+      messageContainer.appendChild(message);
+      utterance.text = event.data;
+
+    };
+
+
+    startDetectionButton.addEventListener('click', async () => {
+      // Get the microphone input
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      // Create an AudioContext for VAD
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      dataArray = new Uint8Array(analyser.fftSize);
+
+      // Create a MediaStreamDestination to record audio
+      const destination = audioContext.createMediaStreamDestination();
+      source.connect(analyser);
+      source.connect(destination); // Connect source to the destination
+
+      checkForVoice(stream); // Pass the destination stream to check for voice
+
+      startDetectionButton.disabled = true;
+
+    });
+
+
+
+    function checkForVoice(stream) {
+      analyser.getByteTimeDomainData(dataArray);
+
+      // Calculate average audio level
+      const rms = Math.sqrt(dataArray.reduce((sum, value) => sum + (value - 128) ** 2, 0) / dataArray.length);
+      const silenceThreshold = 10; // Adjust based on your requirements
+
+      if (rms > silenceThreshold) {
+        console.log('Voice detected');
+        if (!recording) {
+          socket.send('started');
+          startRecording(stream); // Start recording with the provided stream
+        }
+        clearTimeout(silenceTimeout);
+        silenceTimeout = null;
+      } else {
+        if (recording && !silenceTimeout) {
+          silenceTimeout = setTimeout(() => {
+            stopRecording();
+          }, 3000); // Stop recording after 3 seconds of silence
+        }
+      }
+
+      requestAnimationFrame(() => checkForVoice(stream)); // Keep checking for voice activity
+    }
+
+    function startRecording(stream) {
+      console.log('Starting recording...');
+      audioChunks = []; // Reset the buffer
+
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0 && socket.readyState == 1) {
+          socket.send(event.data);
+        }
+      };
+
+      mediaRecorder.start(100); // Capture every 100ms
+      console.log('Streaming started...'); // Start recording
+      recording = true; // Mark as recording
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        console.log('Stopped recording, sending audio buffer to server...');
+        socket.send('finished');
+      }
+      recording = false; // Mark as not recording
+    }
+
+    function sendAudioBuffer() {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); // Combine audio chunks into a Blob
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(audioBlob);
+      reader.onloadend = () => {
+        // const arrayBuffer = reader.result;
+        // socket.send(arrayBuffer); // Send the audio buffer to the server
+
+      };
+    }
+
+    function stopDetection() {
+      stopRecording(); // Stop any ongoing recording
+      audioContext.close(); // Close the audio context
+      startDetectionButton.disabled = false;
+
+    }
+  </script>
 </body>
 
 </html>
