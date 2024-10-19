@@ -12,7 +12,7 @@ router.post('/tfng', async (req, res) => {
     var {difficulty, lang} = req.body;
  
     
-    requestAITFNG(difficulty).then((data)=>{
+    requestAITFNG(difficulty, lang).then((data)=>{
         res.send(data)
     })
    

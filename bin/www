@@ -147,7 +147,7 @@ requestAIWriting = function(text, title) {
                             * Ensure the feedback covers the four IELTS criteria: Task Achievement, Coherence and Cohesion, Lexical Resource, and Grammatical Range and Accuracy.
                             * Provide a numeric IELTS score for each of the four criteria, and an overall score.
                             * Do not use markdown formatting.
-                            * Feedback should be in English and comprehensive, highlighting both strengths and areas for improvement.
+                            * Feedback should be in Russian and comprehensive, highlighting both strengths and areas for improvement.
                             `
                           }
                         ]
@@ -333,7 +333,7 @@ requestAITitle = function() {
   });
 }
 
-requestAITFNG = function(difficulty){
+requestAITFNG = function(difficulty, lang){
   return new Promise((resolve, reject) => {
     var json_structure = `
     {
@@ -355,6 +355,7 @@ requestAITFNG = function(difficulty){
                       {
                         "text": `Make up a random "True/False/Not given" Reading Section Exam
                         * Output in json structure: ${json_structure}
+                        * Exam Language: ${getLanguageFullName(lang)}
                         * Difficulty: ${difficulty}
                         * only 6 questions
                         * more than 150 words
@@ -392,7 +393,7 @@ requestAITFNG = function(difficulty){
                     resolve(jsonData);
                 } else {
                     console.log("Invalid JSON, retrying...");
-                    requestAITFNG(difficulty).then(resolve).catch(reject);
+                    requestAITFNG(difficulty, lang).then(resolve).catch(reject);
                 }
             } catch (parseError) {
                 reject(parseError);
@@ -471,3 +472,16 @@ requestAIQuestion= function() {
       request(options, handleResponse);
   });
 }
+
+function getLanguageFullName(lang) {
+  const languages = {
+      en: "Английский",
+      ru: "Русский",
+      fr: "Французский",
+      es: "Испанский",
+      ch: "Китайский"
+  };
+  
+  return languages[lang] || "Unknown Language";
+}
+

@@ -121,11 +121,12 @@
 
         function generateExam() {
             const difficulty = params.get('difficulty');
-            console.log(difficulty)
+            const lang = params.get('lang');
+           
             $.ajax({
                 url: "/reading/tfng",
                 method: 'post',
-                data: { difficulty: difficulty },
+                data: { difficulty: difficulty, lang: lang },
                 success: function (r) {
                     var data = JSON.parse(r);
                     console.log(data)

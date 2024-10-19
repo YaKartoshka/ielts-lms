@@ -26,11 +26,6 @@
                 background-color: #888;
                 border-radius: 5px;
             }
-
-            .news-content {
-                max-height: 270px;
-                overflow-y: auto;
-            }
         </style>
 </head>
 
@@ -50,8 +45,8 @@
     <main>
         <%- include('./components/nav_bar.ejs.html') %>
             <div class="content">
-                <div class="content-head p-3">
-                    <div class="person-info-box p-4">
+                <div class="content-head">
+                    <div class="person-info-box p-4  rounded">
                         <div class="person-head d-flex pb-3">
                             <h5>
                                 <%=L('index1', language, 'Welcome' ) %>
@@ -63,7 +58,9 @@
                         <div class="person-info d-flex flex-column">
                             <div class="info status">
                                 <div>
-                                    <p>Status</p>
+                                    <p>
+                                        <%=L('index2', language, 'Status' ) %>
+                                    </p>
                                 </div>
                                 <div>
                                     School
@@ -71,7 +68,9 @@
                             </div>
                             <div class="info education">
                                 <div>
-                                    <p>Education</p>
+                                    <p>
+                                        <%=L('index4', language, 'Education' ) %>
+                                    </p>
                                 </div>
                                 <div>
                                     <p>Bachelor`s degree, Astana IT University</p>
@@ -79,7 +78,9 @@
                             </div>
                             <div class="info location">
                                 <div>
-                                    <p>Location</p>
+                                    <p>
+                                        <%=L('index5', language, 'Location' ) %>
+                                    </p>
                                 </div>
                                 <div>
                                     <p>Astana, Kazakhstan</p>
@@ -87,38 +88,51 @@
                             </div>
                             <div class="info planning">
                                 <div>
-                                    <p>Planning</p>
+                                    <p>
+                                        <%=L('index6', language, 'Planning' ) %>
+                                    </p>
                                 </div>
                                 <div>
-                                    <p>Bachelor</p>
+                                    <p>MSc in Computer Science</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="knowledge-test d-flex flex-column p-4">
                         <div class="test d-flex justify-content-between">
-                            <p>What is your english level?</p>
+                            <p>
+                                <%=L('index7', language, 'What is your english level' ) %>?
+                            </p>
                             <div class="test-btn">
-                                <a class="btn btn-primary text-white" href="/test" >Take the test</a>
+                                <a class="btn btn-primary text-white" href="/test">
+                                    <%=L('index8', language, 'Take the test' ) %>
+                                </a>
                             </div>
                         </div>
                         <div class="test-grade">
-                            <p>Grade: Test not passed yet.</p>
+                            <div class="el-tablo highlight">
+                                <div class="label"><%=L('index9', language, 'Grade' ) %></div>
+                                <div class="value">6.5</div>
+                            </div>
+                            <p>
+                                
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <div class="content-body">
-                    <div class="courses">
+                    <div class="courses element-box mt-3">
                         <h5>Courses</h5>
-                        <div class="courses-list">
+                        <div class="courses-list gap-1">
                             <div class="course">
                                 <div class="course-img">
                                     <img src="/public/images/IELTS_all-in.png" alt="">
                                 </div>
                                 <div class="course-title p-3">
                                     <h5>IELTS Marathon!</h5>
-                                    <span class="material-symbols-outlined" style="color: #4ba5ec; font-weight: bold; cursor: pointer;">
+                                    <span class="material-symbols-outlined"
+                                        style="color: #4ba5ec; font-weight: bold; cursor: pointer;">
                                         arrow_forward
                                     </span>
                                 </div>
@@ -129,7 +143,8 @@
                                 </div>
                                 <div class="course-title p-3">
                                     <h5>IELTS all-in!</h5>
-                                    <span class="material-symbols-outlined" style="color: #4ba5ec; font-weight: bold; cursor: pointer;">
+                                    <span class="material-symbols-outlined"
+                                        style="color: #4ba5ec; font-weight: bold; cursor: pointer;">
                                         arrow_forward
                                     </span>
                                 </div>
@@ -140,7 +155,8 @@
                                 </div>
                                 <div class="course-title p-3">
                                     <h5>NUET Math</h5>
-                                    <span class="material-symbols-outlined" style="color: #4ba5ec; font-weight: bold; cursor: pointer;">
+                                    <span class="material-symbols-outlined"
+                                        style="color: #4ba5ec; font-weight: bold; cursor: pointer;">
                                         arrow_forward
                                     </span>
                                 </div>
@@ -151,7 +167,8 @@
                                 </div>
                                 <div class="course-title p-3">
                                     <h5>NUET Critical Thinking!</h5>
-                                    <span class="material-symbols-outlined" style="color: #4ba5ec; font-weight: bold; cursor: pointer;">
+                                    <span class="material-symbols-outlined"
+                                        style="color: #4ba5ec; font-weight: bold; cursor: pointer;">
                                         arrow_forward
                                     </span>
                                 </div>
