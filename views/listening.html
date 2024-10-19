@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%=L('index1', language, 'News' ) %>
+    </title>
+    <link rel="shortcut icon" href="../public/images/Favicon.png" type="image/x-icon">
+    <%- include('./components/head.ejs.html') %>
+        <style>
+            .content-body {
+                margin: 10px 0;
+                max-height: 600px;
+                overflow-y: auto;
+                padding: 10px;
+            }
+
+            ::-webkit-scrollbar {
+                width: 4px;
+                /* Width of the entire scrollbar */
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background-color: #888;
+                border-radius: 5px;
+            }
+
+            .news-content {
+                max-height: 270px;
+                overflow-y: auto;
+            }
+        </style>
+</head>
+
+<body>
+    <header>
+
+        <div class="logo d-flex align-items-center">
+            <span class="material-symbols-outlined btn btn-light px-2 py-0 me-3 burger-menu" style="display: none;"
+                onclick="toggleMenu()">
+                menu
+            </span>
+
+            <a href="/"><img src="/public/images/TilAI.png" alt=""></a>
+        </div>
+        <%- include('./components/profile_bar.ejs.html') %>
+    </header>
+    <main>
+        <%- include('./components/nav_bar.ejs.html') %>
+            <div class="content">
+                <div class="content-head p-3 element-box ">
+                    <h4>Оцените свое слушание на основе мультиков</h4>
+                </div>
+
+                <div class="content-body">
+                    
+                </div>
+            </div>
+
+    </main>
+    <footer></footer>
+
+    
+
+
+
+    <script type="text/javascript" src="https://s2.webapi.ai/chat-widget/uniq-chat.js"></script>
+
+    <script>
+        var ailabs_user_info = {
+            'client': 'c1463',
+            'welcome_message': 'Welcome to the chat 👋',
+            'popup_mode': 0, //0-off, 1-auto popup after 10 seconds for new users
+            'input_comment': 'Type your message or /start to restart'
+        };
+        AILabsChatStart();
+    </script>
+
+
+    <!-- END OF MODALS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var globalNews;
+        var globalNewsId;
+
+        $(document).ready(function () {
+            loading(1);
+            loading(0);
+        });
+
+        $(document).ready(function () {
+            var currentUrl = window.location.pathname;
+
+            $(".nav-bar ul li").each(function () {
+                var listItem = $(this);
+                var listItemLink = listItem.find("a");
+                var listItemHref = listItemLink.attr("href");
+
+                if (currentUrl === listItemHref) {
+                    listItem.addClass("active");
+                } else {
+                    listItem.removeClass("active");
+                }
+            });
+        });
+
+
+
+    </script>
+</body>
+
+</html>

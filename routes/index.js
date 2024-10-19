@@ -19,6 +19,10 @@ router.get('/login', (req, res) => {
     res.render('login', { role: req.session.role, L:L, language: req.cookies.language ? req.cookies.language : 'en' });
 });
 
+router.get('/test', (req, res) => {
+    res.render('test', { role: req.session.role, L:L, language: req.cookies.language ? req.cookies.language : 'en' });
+});
+
 router.get('/speaking', (req, res) => {
     res.render('speaking', { role: req.session.role, L:L, language: req.cookies.language ? req.cookies.language : 'en' });
 });
@@ -29,6 +33,10 @@ router.get('/writing', (req, res) => {
 
 router.get('/reading', (req, res) => {
     res.render('reading', { role: req.session.role, L:L, language: req.cookies.language ? req.cookies.language : 'en' });
+});
+
+router.get('/listening', (req, res) => {
+    res.render('listening', { role: req.session.role, L:L, language: req.cookies.language ? req.cookies.language : 'en' });
 });
 
 router.get('/reading/tfng', (req, res) => {

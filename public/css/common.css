@@ -9,12 +9,15 @@ header {
     height: 60px;
     padding-left: 30px;
     align-items: center;
-    background-color: #262626;
+    background-color: white;
     font-family: RedHatDisplayMed;
+    border-bottom: 1px rgb(233, 233, 233) solid;
 }
 
+
 header .logo img {
-    height: 18px;
+    height: 20px;
+    margin-left: 25px;
 }
 
 header .dropdown-content{
