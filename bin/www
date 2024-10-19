@@ -25,6 +25,9 @@ server.listen(conf.port);
 server.on("error", onError);
 
 
+ https.createServer(options, app).listen(443, () => {
+    console.log('App listening on port 443!');
+  });
 
 
 
