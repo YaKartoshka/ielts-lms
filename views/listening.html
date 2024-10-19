@@ -50,15 +50,16 @@
     <main>
         <%- include('./components/nav_bar.ejs.html') %>
             <div class="content">
-                <div class="p-3 element-box ">
+                <div class="p-3 element-box d-flex align-items-center gap-3">
                     <h4>Оцените свое слушание на основе мультиков созданные вами</h4>
+                    <div class="element-info-icon" style="font-size: 24px; color: #047bf8;"><div class="fa fa-video-camera"></div></div>
                 </div>
 
                 <div class="">
                     <div class="element-box" id="demo">
                         <div class="alert alert-info">
                             <strong>Помните!</strong> Чем детальнее ваша история тем лучше качество мультика.
-                          </div>
+                        </div>
                         <div class="mb-3 mt-3">
                             <label for="email">Расскажите свою историю из жизни:</label>
                             <input type="email" class="form-control" id="prompt"
@@ -72,9 +73,11 @@
                                 <option value="ru">Русский</option>
                             </select>
                         </div>
-                        <button type="button" class="btn btn-primary" onclick="demoRequest()" id="submit_prompt_btn">Отправить</button>
-                        <div class="alert alert-primary mt-3 align-items-center gap-3" id="demo_url" style="display: none;">
-            
+                        <button type="button" class="btn btn-primary" onclick="testRequest()"
+                            id="submit_prompt_btn">Отправить</button>
+                        <div class="alert alert-primary mt-3 align-items-center gap-3" id="demo_url"
+                            style="display: none;">
+
                         </div>
                     </div>
                 </div>
@@ -83,7 +86,7 @@
     </main>
     <footer></footer>
 
-    
+
 
 
 
@@ -195,12 +198,71 @@
             }
         }
 
-        if (globalDemoUrl) {
-            $('#demo_url').html(`Follow the link to see your cartoon: <a href="http://localhost${globalDemoUrl}" target="_blank">Link</a>`)
-            $('#demo_url').css('display', 'flex')
-            $('#demo_url').show()
-        }
+        function testRequest() {
+            let email = $('#email').val();
+            let full_name = $('#full_name').val();
+            let prompt = $('#prompt').val();
+            let lang = $('#lang').val()
+            $('#submit_prompt_btn').attr('disabled', true)
+            if (email == '' || full_name == '' || prompt == '') {
+                $.ambiance({
+                    message: "Please fill in all fields!",
+                    title: "Empty data",
+                    type: "error"
+                });
+                $('#submit_prompt_btn').attr('disabled', false)
+            } else if (prompt.length < 25 && prompt.length > 250) {
+                $.ambiance({
+                    message: "Prompt must be longer and contain more details and no more that 250 characters",
+                    title: "Wrong prompt",
+                    type: "error"
+                });
+                $('#submit_prompt_btn').attr('disabled', false)
+            } else if (globalDemoUrl) {
+                $.ambiance({
+                    message: "You already tried to make a cartoon",
+                    title: "Error",
+                    type: "error"
+                });
+                $('#submit_prompt_btn').attr('disabled', false)
+            } else {
+                $.ambiance({
+                    message: "Your request has been successfully sent. Please wait until the link appears.",
+                    title: "Success!",
+                    type: "success"
+                });
+                $('#demo_url').html(`<div class="spinner-border text-light"></div> Please wait 2-3 minutes until the end of processing the request`)
+                $('#demo_url').css('display', 'flex');
+                $('#demo_url').show();
+                setTimeout(()=>{
+                    var link = "/public/cartoons/cartoon.mp4"
+                    if (link) {
+                        globalDemoUrl = link
+                        $('#demo_url').html(`Follow the link to see your cartoon: <a href="${window.location.origin}${globalDemoUrl}" target="_blank">Link</a>`)
+                        sessionStorage.setItem('demo_url', globalDemoUrl)
+                    } else {
+                        $.ambiance({
+                            message: "Something went wrong. Try agail later",
+                            title: "Error",
+                            type: "error"
+                        });
+                    }
+                },10000)
+               
 
+
+
+
+
+
+            }
+
+            if (globalDemoUrl) {
+                $('#demo_url').html(`Follow the link to see your cartoon: <a href="http://localhost:4000${globalDemoUrl}" target="_blank">Link</a>`)
+                $('#demo_url').css('display', 'flex')
+                $('#demo_url').show()
+            }
+        }
     </script>
 </body>
 
