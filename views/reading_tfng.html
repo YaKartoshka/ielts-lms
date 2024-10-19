@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%=L('index1', language, 'News' ) %>
+    </title>
+    <link rel="shortcut icon" href="../public/images/Favicon.png" type="image/x-icon">
+    <%- include('./components/head.ejs.html') %>
+        <style>
+            .content-body {
+                margin: 10px 0;
+                max-height: 600px;
+                overflow-y: auto;
+                padding: 10px;
+            }
+
+            ::-webkit-scrollbar {
+                width: 4px;
+                /* Width of the entire scrollbar */
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background-color: #888;
+                border-radius: 5px;
+            }
+
+            .news-content {
+                max-height: 270px;
+                overflow-y: auto;
+            }
+        </style>
+</head>
+
+<body>
+    <header>
+
+        <div class="logo d-flex align-items-center">
+            <span class="material-symbols-outlined btn btn-light px-2 py-0 me-3 burger-menu" style="display: none;"
+                onclick="toggleMenu()">
+                menu
+            </span>
+
+            <a href="/"><img src="/public/images/CoachMate.png" alt=""></a>
+        </div>
+        <%- include('./components/profile_bar.ejs.html') %>
+    </header>
+    <main>
+        <%- include('./components/nav_bar.ejs.html') %>
+            <div class="content">
+                <div class="p-3 element-box ">
+                    <h4>Задача True/False/Not Given</h4>
+                </div>
+
+                <div class="p-3 element-box ">
+                    <h5 id="title"></h5>
+                    <p id="text"></p>
+                </div>
+
+                <div class="p-3 element-box" id="questions">
+                    
+                </div>
+                <div class="element-box">
+                    <button class="btn btn-primary" onclick="checkAnswers()">Проверить ответы</button>
+                </div>
+            </div>
+
+    </main>
+    <footer></footer>
+
+    <script type="text/javascript" src="https://s2.webapi.ai/chat-widget/uniq-chat.js"></script>
+
+    <script>
+        var ailabs_user_info = {
+            'client': 'c1463',
+            'welcome_message': 'Welcome to the chat 👋',
+            'popup_mode': 0, //0-off, 1-auto popup after 10 seconds for new users
+            'input_comment': 'Type your message or /start to restart'
+        };
+        AILabsChatStart();
+    </script>
+
+
+    <!-- END OF MODALS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var globalNews;
+        var globalData;
+        // Get the current URL
+        const currentUrl = window.location.href;
+
+        // Create a URL object
+        const url = new URL(currentUrl);
+
+        // Get the query parameters
+        const params = new URLSearchParams(url.search);
+
+        $(document).ready(function () {
+            loading(1);
+            generateExam();
+          
+        });
+
+        $(document).ready(function () {
+            var currentUrl = window.location.pathname;
+
+            $(".nav-bar ul li").each(function () {
+                var listItem = $(this);
+                var listItemLink = listItem.find("a");
+                var listItemHref = listItemLink.attr("href");
+
+                if (currentUrl === listItemHref) {
+                    listItem.addClass("active");
+                } else {
+                    listItem.removeClass("active");
+                }
+            });
+        });
+
+        function generateExam() {
+            const difficulty = params.get('difficulty');
+            console.log(difficulty)
+            $.ajax({
+                url: "/reading/tfng",
+                method: 'post',
+                data: { difficulty: difficulty },
+                success: function (r) {
+                    var data = JSON.parse(r);
+                    console.log(data)
+                    loading(0);
+                    globalData = data
+                    $('#title').text(data.title);
+                    $('#text').text(data.text);
+                    data.questions.forEach((item, index) => {
+                    $('#questions').append(`
+                        <div class="question" id="question${index}">
+                            <p style="margin-top: 5px;">${index + 1}. ${item.question}</p>
+                            <select name="question${index}" class="form-control">
+                                <option value="" disabled selected>Select an answer</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                                <option value="not_given">Not Given</option>
+                            </select>
+                            <span class="feedback"></span>
+                            <br>
+                        </div>
+                    `);
+                });
+
+                    loading(0);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+        function checkAnswers() {
+        let score = 0;
+        const totalQuestions = globalData.questions.length;
+
+        // Check each question
+        globalData.questions.forEach((item, index) => {
+            const selectedAnswer = $(`select[name="question${index}"]`).val();
+            const feedback = $(`#question${index} .feedback`);
+
+            if (selectedAnswer === item.answer) {
+                score++;
+                feedback.text('Correct').css('color', 'green');
+            } else {
+                feedback.html(`Incorrect. Correct answer: ${item.answer}`).css('color', 'red');
+            }
+        });
+
+        // Display the overall score
+        $('#score').text(`You scored ${score} out of ${totalQuestions}`);
+    }
+
+    </script>
+</body>
+
+</html>

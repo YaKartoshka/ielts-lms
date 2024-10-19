@@ -114,8 +114,21 @@ decode = function (str, shift) {
   return encode(str, 26 - shift);
 }
 
-requestAI = function(text) {
+requestAIWriting = function(text, title) {
     return new Promise((resolve, reject) => {
+        var json_structure = `
+        {
+          grade: '',
+          feedback: '',
+          improvements: {
+            task_achievement: ['sentence1', 'sentence2', ...],
+            coherence : ['sentence1', 'sentence2', 'example1', ...],
+            lexical_resource: ['sentence1', 'sentence2', 'example1', ...],
+            grammatical_range_accuracy : ['sentence1', 'sentence2', 'example1', ...],
+
+          }
+        }
+        `
         var options = {
             method: 'POST',
             url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + process.env.GEMINI_API_KEY,
@@ -126,13 +139,17 @@ requestAI = function(text) {
                 "contents": [
                     {
                         "parts": [
-                            {
-                                "text": `Оцени текст для IELTS writing, дай хорошую обратную связь.
-                                * Используйте JSON структуру для output с полями grade, feedback, improvements. 
-                                * Text: ${text}
-                                * Оценка в формате IELTS с цифрами
-                                ` 
-                                }
+                          {
+                            "text": `Please provide a assessment of the following text for IELTS writing and give detailed feedback:
+                            * Use the specified JSON structure: ${json_structure}.
+                            * Title of the essay: "${title}". Text must be related to title, if not band 1.
+                            * Text: "${text}".
+                            * Ensure the feedback covers the four IELTS criteria: Task Achievement, Coherence and Cohesion, Lexical Resource, and Grammatical Range and Accuracy.
+                            * Provide a numeric IELTS score for each of the four criteria, and an overall score.
+                            * Do not use markdown formatting.
+                            * Feedback should be in English and comprehensive, highlighting both strengths and areas for improvement.
+                            `
+                          }
                         ]
                     }
                 ]
@@ -165,7 +182,7 @@ requestAI = function(text) {
                         resolve(jsonData);
                     } else {
                         console.log("Invalid JSON, retrying...");
-                        requestAI(text).then(resolve).catch(reject);
+                        requestAIWriting(text, title).then(resolve).catch(reject);
                     }
                 } catch (parseError) {
                     reject(parseError);
@@ -175,4 +192,282 @@ requestAI = function(text) {
 
         request(options, handleResponse);
     });
+}
+
+requestAISpeaking = function(text, question) {
+  return new Promise((resolve, reject) => {
+      var json_structure = `
+      {
+        grade: '',
+        feedback: '',
+        improvement: 'example'
+      }
+      `
+      var options = {
+          method: 'POST',
+          url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + process.env.GEMINI_API_KEY,
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              "contents": [
+                  {
+                      "parts": [
+                        {
+                          "text": `Please provide a assessment of the following text for speaking:
+                          * Use the specified JSON structure: ${json_structure}.
+                          * Title of the essay: "${question}". Text must be related to title, if not band 1.
+                          * Text: "${text}".
+                          * Do not use markdown formatting.
+                          * Feedback should be in Russian and comprehensive, highlighting both strengths and areas for improvement.
+                          `
+                        }
+                      ]
+                  }
+              ]
+          })
+      };
+
+      function validateJson(data) {
+          try {
+              JSON.parse(data);
+              return true;
+          } catch (e) {
+              return false;
+          }
+      }
+
+      function handleResponse(error, response) {
+          if (error) {
+              reject(error);
+          } else {
+              let jsonData;
+              try {
+                console.log(response)
+                  var resp = JSON.parse(response.body)
+                  
+                  var scenario_json = resp.candidates[0].content.parts[0].text
+                  let jsonData = scenario_json.replace(/json/g, '').replace(/```/g, '');
+
+                  console.log(jsonData)
+                  if (validateJson(jsonData)) {
+                      resolve(jsonData);
+                  } else {
+                      console.log("Invalid JSON, retrying...");
+                      requestAIWriting(text, title).then(resolve).catch(reject);
+                  }
+              } catch (parseError) {
+                  reject(parseError);
+              }
+          }
+      }
+
+      request(options, handleResponse);
+  });
+}
+
+
+requestAITitle = function() {
+  return new Promise((resolve, reject) => {
+      var json_structure = `
+      {
+        title: 'title'
+      }
+      `
+      var options = {
+          method: 'POST',
+          url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + process.env.GEMINI_API_KEY,
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              "contents": [
+                  {
+                      "parts": [
+                        {
+                          "text": `Make up a random title for IELTS Writing Exam
+                          * Output in json structure: ${json_structure}
+                          `
+                        }
+                      ]
+                  }
+              ]
+          })
+      };
+
+      function validateJson(data) {
+          try {
+              JSON.parse(data);
+              return true;
+          } catch (e) {
+              return false;
+          }
+      }
+
+      function handleResponse(error, response) {
+          if (error) {
+              reject(error);
+          } else {
+              let jsonData;
+              try {
+                console.log(response)
+                  var resp = JSON.parse(response.body)
+                  
+                  var scenario_json = resp.candidates[0].content.parts[0].text
+                  let jsonData = scenario_json.replace(/json/g, '').replace(/```/g, '');
+
+                  console.log(jsonData)
+                  if (validateJson(jsonData)) {
+                      resolve(jsonData);
+                  } else {
+                      console.log("Invalid JSON, retrying...");
+                      requestAITitle().then(resolve).catch(reject);
+                  }
+              } catch (parseError) {
+                  reject(parseError);
+              }
+          }
+      }
+
+      request(options, handleResponse);
+  });
+}
+
+requestAITFNG = function(difficulty){
+  return new Promise((resolve, reject) => {
+    var json_structure = `
+    {
+      text: 'Reading Text',
+      title: 'Title',
+      questions: [{question: "Question", answer: "true/false/not_given"}, ...]
+    }
+    `
+    var options = {
+        method: 'POST',
+        url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + process.env.GEMINI_API_KEY,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "contents": [
+                {
+                    "parts": [
+                      {
+                        "text": `Make up a random "True/False/Not given" Reading Section Exam
+                        * Output in json structure: ${json_structure}
+                        * Difficulty: ${difficulty}
+                        * only 6 questions
+                        * more than 150 words
+                        `
+                      }
+                    ]
+                }
+            ]
+        })
+    };
+
+    function validateJson(data) {
+        try {
+            JSON.parse(data);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function handleResponse(error, response) {
+        if (error) {
+            reject(error);
+        } else {
+            let jsonData;
+            try {
+              console.log(response)
+                var resp = JSON.parse(response.body)
+                
+                var scenario_json = resp.candidates[0].content.parts[0].text
+                let jsonData = scenario_json.replace(/json/g, '').replace(/```/g, '');
+
+                console.log(jsonData)
+                if (validateJson(jsonData)) {
+                    resolve(jsonData);
+                } else {
+                    console.log("Invalid JSON, retrying...");
+                    requestAITFNG(difficulty).then(resolve).catch(reject);
+                }
+            } catch (parseError) {
+                reject(parseError);
+            }
+        }
+    }
+
+    request(options, handleResponse);
+});
+}
+
+
+requestAIQuestion= function() {
+  return new Promise((resolve, reject) => {
+      var json_structure = `
+      {
+        question: 'question'
+      }
+      `
+      var options = {
+          method: 'POST',
+          url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + process.env.GEMINI_API_KEY,
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              "contents": [
+                  {
+                      "parts": [
+                        {
+                          "text": `Generate a question to check speaking skills of user
+                          * Open question
+                          * Output in json structure: ${json_structure}
+                          `
+                        }
+                      ]
+                  }
+              ]
+          })
+      };
+
+      function validateJson(data) {
+          try {
+              JSON.parse(data);
+              return true;
+          } catch (e) {
+              return false;
+          }
+      }
+
+      function handleResponse(error, response) {
+          if (error) {
+              reject(error);
+          } else {
+              let jsonData;
+              try {
+                console.log(response)
+                  var resp = JSON.parse(response.body)
+                  
+                  var scenario_json = resp.candidates[0].content.parts[0].text
+                  let jsonData = scenario_json.replace(/json/g, '').replace(/```/g, '');
+
+                  console.log(jsonData)
+                  if (validateJson(jsonData)) {
+                      resolve(jsonData);
+                  } else {
+                      console.log("Invalid JSON, retrying...");
+                      requestAITitle().then(resolve).catch(reject);
+                  }
+              } catch (parseError) {
+                  reject(parseError);
+              }
+          }
+      }
+
+      request(options, handleResponse);
+  });
 }

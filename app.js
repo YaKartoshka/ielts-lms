@@ -12,6 +12,7 @@ var index = require('./routes/index');
 var auth = require('./routes/auth');
 var speaking = require('./routes/speaking');
 var writing = require('./routes/writing');
+var reading = require('./routes/reading')
 require('./libs/translate')
 //html ejs
 app.set('views', path.join(__dirname, 'views'));
@@ -44,7 +45,7 @@ app.use('/', index);
 app.use('/auth', auth);
 app.use('/speaking', speaking);
 app.use('/writing', writing);
-
+app.use('/reading', reading);
 
 
 app.use((req, res, next) => {

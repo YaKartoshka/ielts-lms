@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/YaKartoshka/coach-mate#readme",
   "dependencies": {
+    "@google-cloud/speech": "^6.7.0",
+    "@google-cloud/text-to-speech": "^5.5.0",
     "aws-sdk": "^2.1443.0",
     "body-parser": "^1.20.2",
     "brackets-json-db": "^1.0.2",

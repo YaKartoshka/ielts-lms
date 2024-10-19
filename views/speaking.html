@@ -2,116 +2,195 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%=L('index1', language, 'News') %></title>
-    <link rel="shortcut icon" href="../public/images/Favicon.png" type="image/x-icon">
-    <%- include('./components/head.ejs.html') %>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaking</title>
+  <link rel="shortcut icon" href="../public/images/Favicon.png" type="image/x-icon">
+  <%- include('./components/head.ejs.html') %>
     <style>
-        .content-body {
-            margin: 10px 0;
-            max-height: 600px;
-            overflow-y: auto;
-            padding: 10px;
-        }
+      .content-body {
+        margin: 10px 0;
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 10px;
+      }
 
-        ::-webkit-scrollbar {
-            width: 4px; /* Width of the entire scrollbar */
-        }
+      ::-webkit-scrollbar {
+        width: 4px;
+        /* Width of the entire scrollbar */
+      }
 
-        ::-webkit-scrollbar-thumb {
-            background-color: #888; 
-            border-radius: 5px; 
-        }
-        .news-content{
-            max-height: 270px;
-            overflow-y: auto;
-        }
+      ::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 5px;
+      }
+
+      .news-content {
+        max-height: 270px;
+        overflow-y: auto;
+      }
+
+      p {
+        white-space: pre-line;
+      }
+
+      .botMessage {
+        width: fit-content;
+        margin: 10px;
+        max-width: 60%;
+      }
     </style>
 </head>
 
 <body>
-    <header>
-     
-        <div class="logo d-flex align-items-center">
-                <span class="material-symbols-outlined btn btn-light px-2 py-0 me-3 burger-menu" style="display: none;" onclick="toggleMenu()">
-                    menu
-                </span>
-             
-            <a href="/"><img src="/public/images/CoachMate.png" alt=""></a>
+  <header>
+
+    <div class="logo d-flex align-items-center">
+      <span class="material-symbols-outlined btn btn-light px-2 py-0 me-3 burger-menu" style="display: none;"
+        onclick="toggleMenu()">
+        menu
+      </span>
+
+      <a href="/"><img src="/public/images/CoachMate.png" alt=""></a>
+    </div>
+    <%- include('./components/profile_bar.ejs.html') %>
+  </header>
+  <main>
+    <%- include('./components/nav_bar.ejs.html') %>
+      <div class="content">
+        <div class="tab-switcher element-box mb-3">
+          <div class="profile-tab active">
+            Realtime Speaking
+          </div>
+          <div class="password-tab">
+            Voice Messages
+          </div>
+
         </div>
-        <%- include('./components/profile_bar.ejs.html') %>
-    </header>
-    <main>
-        <%- include('./components/nav_bar.ejs.html') %>
-            <div class="content">
-                <div class="content-head p-3 element-box">
-                    <h4>AI Realtime API with Voice Detection</h4>
-                    <button id="start-detection" class="btn btn-light"><img src="https://www.pngarts.com/files/2/Play-PNG-Download-Image.png" width="20" alt=""></button>
+        <div class="tab-content">
+          <div class="realtime_ai">
+            <div class="d-flex p-3 element-box align-items-center gap-3">
+              <h4 style="flex: 1">Общение с AI агентом в режиме реального времени</h4>
+              <select id="language" onchange="langChange(this)" name="" class="form-control"
+                style="width: fit-content;">
+                <option value="en">Английский</option>
+                <option value="sp">Испанский</option>
+                <option value="ch">Китайский</option>
+                <option value="fr">Французкий</option>
+                <option value="ru">Русский</option>
+              </select>
+              <button id="start-detection" class="btn btn-light"><img
+                  src="https://www.pngarts.com/files/2/Play-PNG-Download-Image.png" width="20" alt=""></button>
 
-                </div>
-                <div class="content-body element-box">
-                    <div id="messageContainer" class="mt-1"></div>
-                </div>
             </div>
-    </main>
-    <footer></footer>
+            <div class="content-body element-box">
+              <div id="messageContainer" class="mt-1" style="min-height: 400px;">
+                Выберите язык и начните диалог
+              </div>
+            </div>
+          </div>
 
-    <script type="text/javascript" src="https://s2.webapi.ai/chat-widget/uniq-chat.js"></script>
-
-    <script>
-        var ailabs_user_info = {
-            'client': 'c1463',
-            'welcome_message': 'Welcome to the chat 👋',
-            'popup_mode': 0, //0-off, 1-auto popup after 10 seconds for new users
-            'input_comment': 'Type your message or /start to restart'
-        };
-        AILabsChatStart();
-    </script>
-
-
-    <!-- END OF MODALS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        var globalNews;
-        var globalNewsId;
-        var recordState = true;
-
-        $(document).ready(function () {
-            loading(1);
-          
-            loading(0);
-        });
-
-        $(document).ready(function () {
-            var currentUrl = window.location.pathname;
-
-            $(".nav-bar ul li").each(function () {
-                var listItem = $(this);
-                var listItemLink = listItem.find("a");
-                var listItemHref = listItemLink.attr("href");
-
-                if (currentUrl === listItemHref) {
-                    listItem.addClass("active");
-                } else {
-                    listItem.removeClass("active");
-                }
-            });
-        });
+          <div class="voice_ai">
+            <div class="d-flex p-3 element-box align-items-center gap-3">
+              <h4 style="flex: 1">Оценка разговорных навыков голосовым сообщением</h4>
+              <select id="language" onchange="langChange(this)" name="" class="form-control"
+                style="width: fit-content;">
+                <option value="en">Английский</option>
+                <option value="sp">Испанский</option>
+                <option value="ch">Китайский</option>
+                <option value="fr">Французкий</option>
+                <option value="ru">Русский</option>
+              </select>
 
 
-       
+            </div>
+            <div class="content-body element-box">
+              <label for="">Ответьте на данный вопрос</label>
+              <div class="d-flex gap-2">
+                <input name="" class="form-control" id="question" placeholder="Нажмите на кнопку для генерации вопроса">
+                <span id="width-helper" style="visibility:hidden; white-space:pre;"></span>
+                <button class="btn btn-primary btm-sm" onclick="generateQuestion()"><i
+                    class="fa fa-refresh"></i></button>
+              </div>
+              <br>
+              <button id="start-detection-voice" class="btn btn-light m-3"><img
+                  src="https://www.pngarts.com/files/2/Play-PNG-Download-Image.png" width="20" alt=""></button>
+              <div id="messageContainer-voice" class="mt-1" style="min-height: 400px;">
+                Выберите язык и начните диалог
+              </div>
+            </div>
+          </div>
+        </div>
 
-    </script>
+      </div>
+      <audio id="audioPlayer" controls style="display: none;"></audio>
+  </main>
+  <footer></footer>
 
-<script>
+  <script type="text/javascript" src="https://s2.webapi.ai/chat-widget/uniq-chat.js"></script>
+
+  <script>
+    var ailabs_user_info = {
+      'client': 'c1463',
+      'welcome_message': 'Welcome to the chat 👋',
+      'popup_mode': 0, //0-off, 1-auto popup after 10 seconds for new users
+      'input_comment': 'Type your message or /start to restart'
+    };
+    AILabsChatStart();
+  </script>
+
+
+  <!-- END OF MODALS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    var globalNews;
+    var globalNewsId;
+    var globalLang
+
+
+    $(document).ready(function () {
+      loading(1);
+
+      loading(0);
+    });
+
+    function langChange(ths) {
+      globalLang = $(ths).val(); // Get the selected value
+    }
+
+    $(document).ready(function () {
+      var currentUrl = window.location.pathname;
+
+      $(".nav-bar ul li").each(function () {
+        var listItem = $(this);
+        var listItemLink = listItem.find("a");
+        var listItemHref = listItemLink.attr("href");
+
+        if (currentUrl === listItemHref) {
+          listItem.addClass("active");
+        } else {
+          listItem.removeClass("active");
+        }
+      });
+    });
+
+
+
+
+  </script>
+
+  <script>
     const startDetectionButton = document.getElementById('start-detection');
-
-    let mediaRecorder, audioContext, analyser, dataArray, silenceTimeout, audioChunks = [];
+    const startDetectionVoiceButton = document.getElementById('start-detection-voice');
+    let mediaRecorder, audioContext, analyser, dataArray, silenceTimeout, audioChunks = [], voiceAudioChunks = [];
     let recording = false;
+    let recordState = false;
+    let voiceRecordState = false;
+
+    let globalAudioBlob;
     const messageContainer = document.getElementById('messageContainer');
     const utterance = new SpeechSynthesisUtterance();
-
+    const audioPlayer = document.getElementById('audioPlayer');
     const socket = new WebSocket('ws://localhost:4001');
 
     socket.onopen = () => {
@@ -123,10 +202,11 @@
     };
 
     socket.onmessage = (event) => {
-      console.log(event)
       const message = document.createElement('p');
-      message.textContent = `AI: ${event.data}`;
+      message.innerHTML = `<img src="https://png.pngtree.com/png-vector/20220611/ourmid/pngtree-chatbot-icon-chat-bot-robot-png-image_4841963.png" width= "50">: ${event.data.replace(/[*_-]/g, '').replace(/\n/g, "<br>")}`;
+      message.className = 'botMessage p-2 bg-primary w-75 text-white rounded';
 
+      playAudio(event.data.replace(/[*_-]/g, '').replace(/\n/g, "").replace('\\', ''))
       messageContainer.appendChild(message);
       utterance.text = event.data;
 
@@ -134,7 +214,11 @@
 
 
     startDetectionButton.addEventListener('click', async () => {
-      // Get the microphone input
+      if (recordState) {
+        recordState = false;
+        startDetectionButton.firstChild.src = 'https://www.pngarts.com/files/2/Play-PNG-Download-Image.png';
+        return
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       // Create an AudioContext for VAD
@@ -144,20 +228,35 @@
       analyser.fftSize = 2048;
       dataArray = new Uint8Array(analyser.fftSize);
 
+      startDetectionButton.firstChild.src = 'https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-pause-512.png';
       // Create a MediaStreamDestination to record audio
       const destination = audioContext.createMediaStreamDestination();
       source.connect(analyser);
       source.connect(destination); // Connect source to the destination
-
+      recordState = true
       checkForVoice(stream); // Pass the destination stream to check for voice
 
-      startDetectionButton.disabled = true;
+
 
     });
 
+    var tabs = $(".tab-switcher > div");
+    var tabContents = $(".tab-content > div");
 
+    tabs.each(function (index) {
+      $(this).click(function () {
+
+        tabs.removeClass("active");
+        tabContents.removeClass("active");
+
+        $(this).addClass("active");
+        tabContents.eq(index).addClass("active");
+      });
+    });
+    tabs.first().click();
 
     function checkForVoice(stream) {
+      if (!recordState) return
       analyser.getByteTimeDomainData(dataArray);
 
       // Calculate average audio level
@@ -166,6 +265,7 @@
 
       if (rms > silenceThreshold) {
         console.log('Voice detected');
+        audioPlayer.pause();
         if (!recording) {
           socket.send('started');
           startRecording(stream); // Start recording with the provided stream
@@ -192,6 +292,8 @@
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0 && socket.readyState == 1) {
           socket.send(event.data);
+          audioChunks.push(event.data);
+
         }
       };
 
@@ -205,27 +307,168 @@
         mediaRecorder.stop();
         console.log('Stopped recording, sending audio buffer to server...');
         socket.send('finished');
+        displayAudio()
+
       }
       recording = false; // Mark as not recording
     }
 
-    function sendAudioBuffer() {
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); // Combine audio chunks into a Blob
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(audioBlob);
-      reader.onloadend = () => {
-        // const arrayBuffer = reader.result;
-        // socket.send(arrayBuffer); // Send the audio buffer to the server
 
+    async function playAudio(text) {
+      const response = await fetch('/speaking/audio?lang=' + globalLang + '&text=' + text);
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        audioPlayer.src = audioUrl;
+        audioPlayer.play();
+      } else {
+        console.error('Error fetching the audio');
+      }
+    }
+
+    //
+    function displayAudio() {
+      const messageContainer = document.getElementById('messageContainer');
+      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      console.log('Audio URL:', audioUrl);
+
+      const audioElement = document.createElement('audio');
+      const blockElement = document.createElement('div');
+      audioElement.controls = true;
+      audioElement.src = audioUrl;
+      blockElement.style.textAlign = "end"
+      blockElement.className = 'me-5'
+
+
+      blockElement.appendChild(audioElement)
+      messageContainer.appendChild(blockElement);
+
+    }
+
+
+
+
+
+    startDetectionVoiceButton.addEventListener('click', async () => {
+      if (voiceRecordState) {
+        voiceRecordState = false;
+        startDetectionVoiceButton.firstChild.src = 'https://www.pngarts.com/files/2/Play-PNG-Download-Image.png';
+        stopVoiceRecording()
+        return
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      dataArray = new Uint8Array(analyser.fftSize);
+
+      startDetectionVoiceButton.firstChild.src = 'https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-pause-512.png';
+
+      const destination = audioContext.createMediaStreamDestination();
+      source.connect(analyser);
+      source.connect(destination);
+      voiceRecordState = true
+      checkForVoiceMessage(stream);
+    });
+
+    function checkForVoiceMessage(stream) {
+      if (!voiceRecordState) return
+      analyser.getByteTimeDomainData(dataArray);
+
+      startVoiceRecording(stream);
+    }
+
+    function startVoiceRecording(stream) {
+      console.log('Starting recording...');
+      voiceAudioChunks = []; // Reset the buffer
+
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0 && socket.readyState == 1) {
+          voiceAudioChunks.push(event.data);
+        }
       };
+
+      mediaRecorder.start(100);
+      recording = true;
     }
 
-    function stopDetection() {
-      stopRecording(); // Stop any ongoing recording
-      audioContext.close(); // Close the audio context
-      startDetectionButton.disabled = false;
+    function stopVoiceRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+
+        mediaRecorder.onstop = () => {
+
+          const audioBlob  = new Blob(voiceAudioChunks, { type: 'audio/webm' });
+
+          sendAudioToServer(audioBlob);
+        };
+      }
+      
+    }
+
+    function sendAudioToServer(audioBlob) {
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm'); // Append audio as file
+
+      $.ajax({
+        url: '/speaking/audio', // Node.js server route to handle the upload
+        type: 'POST',
+        data: formData,
+        processData: false, // Prevent jQuery from converting the FormData object into a string
+        contentType: false, // Let jQuery set the correct content type
+        success: function (response) {
+          console.log('Audio uploaded successfully:', response);
+        },
+        error: function (err) {
+          console.error('Error uploading audio:', err);
+        }
+      });
+    }
+
+    //
+    function displayVoiceAudio() {
+      const messageContainer = document.getElementById('messageContainer-voice');
+      const audioBlob = new Blob(voiceAudioChunks, { type: 'audio/wav' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      console.log('Audio URL:', audioUrl);
+
+      const audioElement = document.createElement('audio');
+      const blockElement = document.createElement('div');
+      audioElement.controls = true;
+      audioElement.src = audioUrl;
+      messageContainer.innerHTML = ''
+      blockElement.className = 'me-5 mt-2'
+
+
+      blockElement.appendChild(audioElement)
+      messageContainer.appendChild(blockElement);
 
     }
+
+    function generateQuestion() {
+      $.ajax({
+        url: "/speaking/question", method: 'post', success: function (r) {
+          var result = JSON.parse(r);
+          console.log(result)
+          loading(1);
+          $("#question").val(result.question);
+          $('#question').width("100%")
+
+          loading(0);
+        },
+        error: function (err) {
+          console.log(err);
+        }
+      });
+    }
+
   </script>
 </body>
 

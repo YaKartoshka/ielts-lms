@@ -5,6 +5,12 @@ const { fdb } = require("../libs/firebase_db");
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs')
 const multer = require('multer');
+
+const textToSpeech = require('@google-cloud/text-to-speech');
+const speech = require('@google-cloud/speech');
+const speech_client = new speech.SpeechClient();
+const { writeFile } = require('node:fs/promises');
+
 const path = require('path')
 const WebSocket = require('ws');
 
@@ -52,7 +58,7 @@ openai_ws.on("open", function open() {
         "type": "session.update",
         "session": {
             "modalities": ["text", "audio"],
-            "instructions": "Your knowledge cutoff is 2023-10. You are a helpful assistant.",
+            "instructions": " Please respond without using markdown formatting or newline characters",
             "voice": "alloy",
             "input_audio_format": "pcm16",
             "output_audio_format": "pcm16",
@@ -88,7 +94,7 @@ openai_ws.on("open", function open() {
 
 openai_ws.on("message", function incoming(message) {
     const parsedMessage = JSON.parse(message.toString());
- 
+
     if (parsedMessage.type === "response.content_part.done") {
         console.log(parsedMessage)
         const transcript = parsedMessage.part.transcript;
@@ -130,7 +136,7 @@ wss.on('connection', (ws) => {
                         }
 
                         const base64Audio = Buffer.from(data).toString('base64');
-                       
+
                         const event = {
                             event_id: "event_123",
                             type: 'conversation.item.create',
@@ -171,15 +177,86 @@ wss.on('connection', (ws) => {
         } else {
             writeStream.write(Buffer.from(new Uint8Array(data)));
         }
-
     });
+});
 
 
+// Creates a client
+const client = new textToSpeech.TextToSpeechClient();
+const voice_storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'temp/'); // Specify the upload directory
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // Name the file uniquely
+    }
+});
+
+const voice_upload = multer({ storage: storage });
+router.post('/audio', voice_upload.single('audio'), async (req, res) => {
+    const filePath = path.join(__dirname, '../temp', req.file.filename);
+
+    try {
+        // Read the uploaded audio file
+        const audioBytes = fs.readFileSync(filePath).toString('base64');
+
+        // Configure the request for transcription
+        const audio = {
+            content: audioBytes,
+        };
+
+        const config = {
+            encoding: 'WEBM_OPUS', // Adjust according to your file format (WEBM_OPUS for webm)
+            sampleRateHertz: 48000, // Set appropriate sample rate
+            languageCode: 'en-US',  // Change to desired language code
+        };
+
+        const request = {
+            audio: audio,
+            config: config,
+        };
+
+        // Transcribe the audio file
+        const [response] = await speech_client.recognize(request);
+        const transcription = response.results
+            .map(result => result.alternatives[0].transcript)
+            .join('\n');
+
+        console.log(`Transcription: ${transcription}`);
+
+        // Respond with the transcription
+        requestAISpeaking().then((data)=>{
+            res.send(data)
+        })
+
+    } catch (error) {
+        console.error('ERROR:', error);
+        res.status(500).send({ error: 'Failed to transcribe audio' });
+    }
+});
+
+router.post('/question', async (req, res) => {
+    requestAIQuestion().then(data => {
+        res.send(data)
+    })
 });
 
 
 
 
+function getLangCode(lang) {
+    if (lang == 'ch') {
+        return 'yue-HK'
+    } else if (lang == 'fr') {
+        return 'fr-FR'
+    } else if (lang == 'sp') {
+        return 'es-ES'
+    } else if (lang == 'ru') {
+        return 'ru-RU'
+    } else {
+        return 'en-US'
+    }
+}
 
 
 

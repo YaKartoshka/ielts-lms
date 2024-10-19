@@ -4,40 +4,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%=L('index1', language, 'News') %></title>
+    <title>
+        <%=L('index1', language, 'News' ) %>
+    </title>
     <link rel="shortcut icon" href="../public/images/Favicon.png" type="image/x-icon">
     <%- include('./components/head.ejs.html') %>
-    <style>
-        .content-body {
-            margin: 10px 0;
-            max-height: 600px;
-            overflow-y: auto;
-            padding: 10px;
-        }
+        <style>
+            .content-body {
+                margin: 10px 0;
+                max-height: 600px;
+                overflow-y: auto;
+                padding: 10px;
+            }
 
-        ::-webkit-scrollbar {
-            width: 4px; /* Width of the entire scrollbar */
-        }
+            ::-webkit-scrollbar {
+                width: 4px;
+                /* Width of the entire scrollbar */
+            }
 
-        ::-webkit-scrollbar-thumb {
-            background-color: #888; 
-            border-radius: 5px; 
-        }
-        .news-content{
-            max-height: 270px;
-            overflow-y: auto;
-        }
-    </style>
+            ::-webkit-scrollbar-thumb {
+                background-color: #888;
+                border-radius: 5px;
+            }
+
+            .news-content {
+                max-height: 270px;
+                overflow-y: auto;
+            }
+        </style>
 </head>
 
 <body>
     <header>
-     
+
         <div class="logo d-flex align-items-center">
-                <span class="material-symbols-outlined btn btn-light px-2 py-0 me-3 burger-menu" style="display: none;" onclick="toggleMenu()">
-                    menu
-                </span>
-             
+            <span class="material-symbols-outlined btn btn-light px-2 py-0 me-3 burger-menu" style="display: none;"
+                onclick="toggleMenu()">
+                menu
+            </span>
+
             <a href="/"><img src="/public/images/CoachMate.png" alt=""></a>
         </div>
         <%- include('./components/profile_bar.ejs.html') %>
@@ -45,11 +50,20 @@
     <main>
         <%- include('./components/nav_bar.ejs.html') %>
             <div class="content">
-                <div class="content-head p-3 element-box">
-                    <h4>Оценивание вашего Writing</h4>
+                <div class=" p-3 element-box">
+                    <h3>Оценивание вашего Writing</h3>
                 </div>
-              
+
                 <div class="element-box">
+                    <label for="">Заголовок</label>
+                    <div class="d-flex gap-2">
+                        <input name="" class="form-control" style="width: fit-content;" id="title">
+                        <span id="width-helper" style="visibility:hidden; white-space:pre;"></span>
+                        <button class="btn btn-primary btm-sm" onclick="generateTitle()"><i class="fa fa-refresh"></i></button>
+                    </div>
+                    <br>
+                    
+                    <br>
                     <label for="">Вставьте ваш текст</label>
                     <textarea name="" class="form-control" id="writing_text"></textarea>
                     <br>
@@ -57,20 +71,49 @@
                 </div>
 
                 <div class="element-box">
-                    <label for="">Оценка</label>
-                    <input type="text" class="form-control" name="" id="writing_grade" style="width: fit-content;" disabled>
-                    <br>
-                    
+                    <div class="el-tablo highlight">
+                        <div class="label">Score</div>
+                        <div class="value" id="writing_grade"></div>
+                    </div>
+
                     <label for="">Обратная связь</label>
                     <textarea name="" class="form-control" id="writing_feedback"></textarea>
                     <br>
+
+                    <br>
+                </div>
+                <div class="element-box">
+                    <div class=" border">
+                        <h4>Task achievement</h4>
+                        <ol id="task_achievment" class="ps-4">
+
+                        </ol>
+                    </div>
+                    <div class=" my-5 border">
+                        <h4>Coherence and cohesion</h4>
+                          <ol id="coherence" class="ps-4">
+                            
+                        </ol>
+                    </div>
+                    <div class=" my-5 border">
+                        <h4>Lexical resource</h4>
+                        <ol id="lexical_resource" class="ps-4">
+                            
+                        </ol>
+                    </div>
+                    <div class=" my-5 border">
+                        <h4>Grammatical range and accuracy</h4>
+                        <ol id="grammatical_range_accuracy" class="ps-4">
+
+                        </ol>
+                    </div>
+
                 </div>
             </div>
-            
     </main>
     <footer></footer>
 
-   
+
 
     <script type="text/javascript" src="https://s2.webapi.ai/chat-widget/uniq-chat.js"></script>
 
@@ -88,12 +131,15 @@
     <!-- END OF MODALS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        var globalNews;
-        var globalNewsId;
+        
+     
 
         $(document).ready(function () {
             loading(1);
-        
+            $('#writing_text').on('input', function () {
+                this.style.height = 'auto';  // Reset the height
+                this.style.height = (this.scrollHeight) + 'px';  // Set new height
+            });
             loading(0);
         });
 
@@ -114,13 +160,14 @@
         });
 
 
-        
+
         function sendWriting() {
             let writing_text = $('#writing_text').val().trim();
+            let title = $('#title').val().trim();
 
-            if (!(writing_text)) {
+            if (writing_text.length < 100) {
                 $.ambiance({
-                    message: "<%=L('index14', language, 'Please provide a text') %>.",
+                    message: "<%=L('index14', language, 'Please provide more text') %>.",
                     type: "error",
                     fade: true,
                     width: 400
@@ -128,14 +175,26 @@
                 return;
             }
 
+            if(!title){
+                $.ambiance({
+                    message: "Заголовок не может быть пустым.",
+                    type: "error",
+                    fade: true,
+                    width: 400
+                });
+                return;
+            }
+
+
+
             loading(2, el = '#send_writing_btn');
 
             const formData = new FormData();
-          
+
             formData.append('writing_text', writing_text);
 
             $.ajax({
-                url: "/writing/grade", method: 'post', data: {writing_text: writing_text},success: function (r) {
+                url: "/writing/grade", method: 'post', data: { writing_text: writing_text, title: title }, success: function (r) {
                     var result = JSON.parse(r);
                     loading(20, el = '#send_writing_btn');
                     $.ambiance({
@@ -144,9 +203,34 @@
                         fade: true
                     });
                     loading(1);
-                    $("#writing_grade").val(result.grade)
-                    $("#writing_feedback").val(result.feedback)
-                    console.log(result.improvements)
+                    $("#writing_grade").html(result.grade);
+                    $("#writing_feedback").val(result.feedback);
+                    let improvementsHTML = ''
+                 
+                    result.improvements.task_achievement.forEach(function (improvement) {
+                        improvementsHTML += `<li> ${improvement} </li>`
+                    })
+                    $('#task_achievment').html(improvementsHTML)
+
+                    improvementsHTML = ''
+                    result.improvements.coherence.forEach(function (improvement) {
+                        improvementsHTML += `<li> ${improvement} </li>`
+                    })
+                    $('#coherence').html(improvementsHTML)
+
+                    improvementsHTML = ''
+                    result.improvements.lexical_resource.forEach(function (improvement) {
+                        improvementsHTML += `<li> ${improvement} </li>`
+                    })
+                    $('#lexical_resource').html(improvementsHTML)
+
+                    improvementsHTML = ''
+                    result.improvements.grammatical_range_accuracy.forEach(function (improvement) {
+                        improvementsHTML += `<li> ${improvement} </li>`
+                    })
+                    $('#grammatical_range_accuracy').html(improvementsHTML)
+
+               
                     loading(0);
                 },
                 error: function (err) {
@@ -155,7 +239,25 @@
             });
         }
 
-      
+        function generateTitle() {
+            $.ajax({
+                url: "/writing/title", method: 'post', success: function (r) {
+                    var result = JSON.parse(r);
+                    console.log(result)
+                    loading(1);
+                    $("#title").val(result.title);
+                    $('#title').width("100%")
+                    
+                    loading(0);
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+            });
+        }
+
+
+
 
 
     </script>

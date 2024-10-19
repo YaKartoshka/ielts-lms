@@ -50,7 +50,7 @@
     <main>
         <%- include('./components/nav_bar.ejs.html') %>
             <div class="content">
-                <div class="content-head p-3 element-box d-flex flex-column align-items-center">
+                <div class="content-head p-3 element-box ">
                     <h4>Укажите тип задачи и сложность</h4>
                 </div>
 
@@ -61,14 +61,14 @@
                                 <p>Истина/Ложь/Не указано</p>
                             </div>
                             <div class="task-difficulty">
-                                <select class="form-control me-3" id="task_difficulty">
-                                    <option value="">Легкий</option>
-                                    <option value="">Средний</option>
-                                    <option value="">Сложный</option>
+                                <select class="form-control me-3" id="task_difficulty_tfng">
+                                    <option value="easy">Легкий</option>
+                                    <option value="medium">Средний</option>
+                                    <option value="hard">Сложный</option>
                                 </select>
                             </div>
                             <div class="task-btn mt-3">
-                                <button class="btn btn-outline-primary">Сдать</button>
+                                <button class="btn btn-outline-primary" onclick="passTFNG()">Сдать</button>
                             </div>
                         </div>
                         <div class="task-card element-box">
@@ -367,167 +367,13 @@
         });
 
 
-        function showNews() {
-            $('.content-body').html('');
-            $.ajax({
-                url: '/news/get-all', method: 'get', success: function (data) {
-                    var news_data = JSON.parse(data);
-                    globalNews = JSON.parse(data)
-                    news_data.forEach((news) => {
-                        var newsDiv = $("<div>").addClass("news");
-                        var image = $("<img>").attr("src", news.image_url ? news.image_url : '/public/images/default_news.png').attr("alt", "");
-                        var newsTitle = $("<div>").addClass("news-title");
-                        var title = $("<h3>").text(news.title).addClass("clickable-title");
-                        // title.on('click', function () {
-                        //     alert(news.news_id)
-                        // });
-                        var newsContent = $("<div>").addClass("news-content");
-                        var dropdownHTML = `
-                        <% if (role=='admin' ) { %>
-                            <button type="button" class="btn btn-light dropdown-toggle d-flex" data-bs-toggle="dropdown" style="float:right;">
-                            <div class="more_icon d-flex">
-                                <span class="material-symbols-outlined d-flex" style="font-size: 25px; font-weight: 900;">
-                                more_horiz
-                                </span>
-                            </div>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#" onclick="showEditNewsModal('${news.news_id}')"><%=L('index9', language, 'Edit') %></a>
-                                <a class="dropdown-item" href="#" onclick="showDeleteNewsModal('${news.news_id}')"><%=L('index13', language, 'Delete') %></a>
-                            </div>
-                        <% } %>
-                       
-                        `;
-                        var newsText = $("<div>").addClass("news-text").text(news.text);
-                        newsTitle.append(title);
-                        newsContent.append(newsTitle, newsText)
-                        newsDiv.append(image, newsContent, dropdownHTML);
-
-                        $('.content-body').append(newsDiv);
-                    });
-                }, error: function (err) {
-                    console.log(err)
-                }
-            })
-        }
+        function passTFNG() {
+            var task_difficulty_tfng = $("#task_difficulty_tfng").val();
 
 
-
-        function showAddNewsModal() {
-            $('#create_news-modal').modal('show');
-        }
-
-        function createNews() {
-            let img = $('#news_img')[0].files[0];
-            let title = $('#news_title').val().trim();
-            let text = $('#news_text').val().trim();
-
-            if (!(title && text)) {
-                $.ambiance({
-                    message: "<%=L('index14', language, 'Please provide a title and text for the news') %>.",
-                    type: "error",
-                    fade: true,
-                    width: 400
-                });
-                return;
-            }
-
-            loading(2, el = '#add_news_btn');
-
-            const formData = new FormData();
-            formData.append('img', img);
-            formData.append('title', title);
-            formData.append('text', text);
-
-            $.ajax({
-                url: "/news/create", method: 'post', data: formData, processData: false, contentType: false, success: function (r) {
-                    $('#create_news-modal').modal('hide');
-                    loading(20, el = '#add_news_btn');
-                    $.ambiance({
-                        message: "<%=L('index15', language, 'News added') %>!",
-                        type: "success",
-                        fade: true
-                    });
-                    loading(1);
-                    showNews();
-                    loading(0);
-                },
-                error: function (err) {
-                    console.log(err);
-                }
-            });
-        }
-
-        function showEditNewsModal(news_id) {
-            globalNewsId = news_id;
-            var selected_news = globalNews.filter(function (news) {
-                return news.news_id == globalNewsId
-            })
-            $('#new_news_title').val(selected_news[0].title);
-            $('#new_news_text').val(selected_news[0].text);
-            $('#edit_news-modal').modal('show');
-        }
+            window.location.href = '/reading/tfng?difficulty=' + task_difficulty_tfng
 
 
-        function editNews() {
-            let img = $('#new_news_img')[0].files[0];
-            let title = $('#new_news_title').val().trim();
-            let text = $('#new_news_text').val().trim();
-
-            loading(2, el = '#edit_news_btn');
-
-            const formData = new FormData();
-            formData.append('img', img);
-            formData.append('title', title);
-            formData.append('text', text);
-            formData.append('news_id', globalNewsId);
-
-            $.ajax({
-                url: "/news/edit", method: 'post', data: formData, processData: false, contentType: false, success: function (r) {
-                    $('#edit_news-modal').modal('hide');
-                    loading(20, el = '#edit_news_btn');
-                    $.ambiance({
-                        message: "<%=L('index16', language, 'News updated') %>!",
-                        type: "success",
-                        fade: true
-                    });
-                    loading(1);
-                    showNews();
-                    loading(0);
-                },
-                error: function (err) {
-                    console.log(err);
-                }
-            });
-        }
-
-        function showDeleteNewsModal(news_id) {
-            globalNewsId = news_id;
-            $('#delete_news-modal').modal('show');
-        }
-
-        function deleteNews() {
-            loading(2, el = '#delete_news_btn');
-            $.ajax({
-                url: '/news/delete',
-                method: 'POST',
-                data: { news_id: globalNewsId },
-                dataType: 'json',
-                success: function (res) {
-                    if (res.r) {
-                        $.ambiance({
-                            message: "<%=L('index17', language, 'Deleted') %>!",
-                            type: "success",
-                            fade: true
-                        });
-                        loading(1);
-                        showNews();
-                        loading(0);
-                    }
-                    $('#delete_news-modal').modal('hide');
-                    loading(20, el = "#delete_news_btn");
-                }
-            })
         }
 
     </script>

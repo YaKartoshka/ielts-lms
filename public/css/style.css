@@ -791,11 +791,11 @@ body {
 .tab-switcher div::before {
     content: "";
     position: absolute;
-    bottom: -5px;
+    bottom: -10px;
     left: 0;
     width: 0;
     height: 3px;
-    background: linear-gradient(to bottom left, #408CFF, #00FFC2);
+    background: linear-gradient(to bottom left, #408CFF, #408CFF);
     ;
     transition: width 0.25s ease;
 }
