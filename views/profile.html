@@ -56,37 +56,54 @@
         <%- include('./components/nav_bar.ejs.html') %>
             <div class="content">
                 <div class="content-head p-3 element-box">
-                    <h4>Найдите консультацию по стране/университету</h4>
+                    
+                    <h4><a href="/advisory" style="color: #000;"><i class="fa fa-arrow-left"></i></a> Профиль</h4>
                 </div>
 
-                <div class="content-body p-3 element-box">
-                    <h6>Поиск по:</h6>
-                    <div class="searching-block d-flex justify-content-between">
-                        <div class="search-country">
-                            <input type="text" class="form-control" id="search_country" placeholder="Cтранам">
-                            <div class="countries-list">
-                                <ul id="countries-list-ul"></ul>
+                <div class="content-body d-flex align-items-start">
+                    <div class="advisor-card element-box">
+                        <div class="advisor-img pb-2">
+                            <img src="../public/images/user_avatar1.png" alt="" width="180" height="180">
+                        </div>
+                        <div class="advisor-fullname">
+                            <p>Имя: Майкл Джонсон</p>
+                        </div>
+                        <div class="advisor-country">
+                            <p>Страна: США</p>
+                        </div>
+                        <div class="advisor-language">
+                            <p>Язык: Английский</p>
+                        </div>
+                        <div class="advisor-uni">
+                            <p>ВУЗ: Массачусетский технологический институт (MIT)</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-info">
+                        <div class="profile-contacts element-box w-100" style="margin-top: 10px;">
+                            <div class="profile-phone">
+                                <h6>Контактный телефон: (555) 123-4567</h6>
+                            </div>
+                            <div class="profile-email">
+                                <h6>Почта: michael.johnson@example.com</h6>
                             </div>
                         </div>
 
-                        <div class="search-uni">
-                            <input type="text" class="form-control" id="search_uni" placeholder="Университетам">
-                            <div class="universities-list">
-                                <ul id="universities-list-ul"></ul>
+                        <div class="uni-images d-flex gap-3 align-items-center">
+                            <div class="element-box">
+                                <img src="../public/images/uni1.png" alt="" width=300 height="200">
+                            </div>
+                            <div class="element-box">
+                                <img src="../public/images/uni2.png" alt="" width=300 height="200">
+                            </div>
+                            <div class="element-box">
+                                <img class="pe-3" src="../public/images/uni3.png" alt="" width=300 height="200">
                             </div>
                         </div>
                     </div>
-                    <div class="searching-btn mt-3">
-                        <button class="btn btn-primary">Поиск</button>
-                    </div>
-                </div>
 
-                <div>
-                    <div class="advisors-list d-flex flex-wrap" id="advisors_list">
 
-                    </div>
                 </div>
-            </div>
 
     </main>
     <footer></footer>
@@ -276,7 +293,7 @@
                         <p>ВУЗ: ${advisor.university ? advisor.university : 'Неизвестно'}</p>
                     </div>
                     <div class="advisor-check">
-                        <a href="/profile" class="btn btn-outline-primary">Check profile</a>
+                        <button class="btn btn-outline-primary">Check profile</button>
                     </div>
                 </div>
                 `
